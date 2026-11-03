@@ -1,0 +1,232 @@
+.dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.chart-container {
+  flex: 1 1 45%;
+}
+
+
+// home.component.scss
+
+.layout-main-container {
+  padding: 1.5rem;
+  background-color: var(--surface-ground);
+  min-height: 100vh;
+}
+
+// Styles pour les cartes KPI
+.card {
+  box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+  border-radius: 6px;
+  background: var(--surface-card);
+  color: var(--text-color);
+  
+  &.border-left-primary {
+    border-left: 4px solid var(--primary-color);
+  }
+  
+  &.border-left-orange {
+    border-left: 4px solid #ff9800;
+  }
+  
+  &.border-left-blue {
+    border-left: 4px solid #2196f3;
+  }
+  
+  &.border-left-green {
+    border-left: 4px solid #4caf50;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Styles pour les bordures colorées
+.border-left-3 {
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+
+.border-primary {
+  border-color: var(--primary-color) !important;
+}
+
+.border-orange-500 {
+  border-color: #ff9800 !important;
+}
+
+.border-blue-500 {
+  border-color: #2196f3 !important;
+}
+
+.border-green-500 {
+  border-color: #4caf50 !important;
+}
+
+// Styles pour les graphiques
+.chart-wrapper {
+  position: relative;
+  
+  canvas {
+    max-height: 100% !important;
+  }
+}
+
+// Styles pour le tableau
+.p-datatable {
+  .p-datatable-thead > tr > th {
+    background-color: var(--surface-section);
+    color: var(--text-color);
+    font-weight: 600;
+    padding: 1rem;
+    border: 1px solid var(--surface-border);
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 1rem;
+    border: 1px solid var(--surface-border);
+  }
+
+  .p-datatable-tbody > tr:nth-child(even) {
+    background-color: var(--surface-hover);
+  }
+
+  .p-datatable-tbody > tr:hover {
+    background-color: var(--surface-hover);
+  }
+}
+
+// Styles pour les avatars
+.p-avatar {
+  &.bg-primary {
+    background-color: var(--primary-color);
+    color: white;
+  }
+}
+
+// Styles pour les tags
+.p-tag {
+  &.p-tag-info {
+    background-color: #2196f3;
+    color: white;
+  }
+}
+
+// Styles pour les boutons
+.p-button {
+  &.p-button-sm {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+
+  &.p-button-outlined {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+
+    &:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+  }
+}
+
+// Styles pour les inputs
+.p-inputtext {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  
+  &:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.2);
+  }
+}
+
+// Styles pour les dropdowns
+.p-dropdown {
+  min-width: 10rem;
+  
+  &.min-w-10rem {
+    min-width: 10rem;
+  }
+
+  .p-dropdown-label {
+    padding: 0.75rem;
+  }
+}
+
+// Animation pour le spinner
+.p-progress-spinner {
+  width: 3rem;
+  height: 3rem;
+  
+  circle {
+    stroke: var(--primary-color);
+  }
+}
+
+// Responsive adjustments
+@media screen and (max-width: 960px) {
+  .layout-main-container {
+    padding: 1rem;
+  }
+
+  .card .card-body {
+    padding: 1rem;
+  }
+
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.75rem;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .layout-main-container {
+    padding: 0.5rem;
+  }
+
+  .card .card-body {
+    padding: 0.75rem;
+  }
+
+  .chart-wrapper {
+    height: 250px !important;
+  }
+}
+
+// Styles pour les états vides
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+
+  .pi {
+    font-size: 4rem;
+    color: var(--text-color-secondary);
+    margin-bottom: 1rem;
+  }
+
+  h4 {
+    color: var(--text-color-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--text-color-secondary);
+    max-width: 30rem;
+    margin: 0 auto 1.5rem auto;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

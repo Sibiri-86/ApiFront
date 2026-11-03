@@ -1,0 +1,194 @@
+<div class="grid">
+    <div class="col-6 md:col-6">
+        <p-table #dt styleClass="p-datatable-responsive-demo p-datatable-sm p-datatable"
+                 [value]="moduleParams"
+                 [rows]="20" dataKey="id"
+                 [(selection)]="selectedModuleParams"
+                 sortMode="multiple"
+                 [globalFilterFields]="['code','libelle','ville', 'filiale.nom']"
+                 [paginator]="true"
+                 [loading]="loading"
+                 scrollHeight="600px"
+                 dataKey="id"
+                 [filterDelay]="0" styleClass="p-datatable-gridlines">
+
+            <!--<ng-template pTemplate="caption">
+
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <span class="block mt-2 md:mt-0 p-input-icon-left" style="margin-left: auto;">
+                       <i class="pi pi-search"></i>
+                       <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Rechercher..." class="w-full sm:w-auto" />
+                       </span>
+                </div><br>
+            </ng-template>-->
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 3em">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    </th>
+                    <th style="font-weight: bold;" pSortableColumn="code">Code
+                        <p-columnFilter type="text" display="menu" field="code"></p-columnFilter>
+
+                    </th>
+                    <th style="font-weight: bold;" pSortableColumn="libelle">libelle
+                        <p-columnFilter type="text" display="menu" field="libelle"></p-columnFilter>
+
+                    </th>
+
+                    <th style="font-weight: bold;">Action</th>
+                </tr>
+                
+            </ng-template>
+
+            <ng-template pTemplate="body" let-moduleParam>
+                <tr [pSelectableRow]="moduleParam">
+                    <td>
+                        <p-tableCheckbox [value]="moduleParam"></p-tableCheckbox>
+                    </td>
+                    <td class="table-separator">{{moduleParam.code }}</td>
+                    <td class="table-separator"> {{moduleParam.libelle }}</td>
+
+
+                    <td style="width:20%; min-width:10rem">
+
+
+                        <button  type="button" pButton pRipple icon="pi pi-pencil"
+                                 class="p-button-rounded p-button-warning mr-2"
+                                 (click)="editModuleParam(moduleParam)">
+                        </button>
+                        <button  type="button" pButton pRipple icon="pi pi-trash"
+                                 class="p-button-rounded p-button-danger mr-2"
+                                 (click)="deleteModuleParam(moduleParam)">
+
+                        </button>
+
+
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage" let-columns>
+                <tr>
+                    <td colspan="8"
+                        style="text-align: center; font-size: 1.2em; color: red; font-weight: bold;"><span
+                        class="text-danger"> Aucun module trouvé ! </span></td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+
+
+
+    </div>
+    <div class="col-6">
+        <div class="card">
+            <form>
+                <div class="flex align-items-center flex-wrap gap-2 mb-3">
+                    <label for="libelle" class="w-4rem">Code <span  class="required">*</span></label>
+                    <input type="text" pInputText style="width: 100%"  id="code" [(ngModel)]="moduleParam.code" [ngModelOptions]="{standalone: true}" required autofocus />
+
+                </div>
+                <div class="flex align-items-center flex-wrap gap-2 mb-3">
+                    <label for="libelle" class="w-4rem">Libelle <span  class="required">*</span></label>
+                    <input type="text" pInputText id="libelle" style="width: 100%" [(ngModel)]="moduleParam.libelle" [ngModelOptions]="{standalone: true}" required autofocus />
+
+                </div>
+                <p-table #dt [value]="menuActions" [columns]="cols" responsiveLayout="scroll" [rows]="10"  [(selection)]="selectedMenus"
+                         [globalFilterFields]="['code','libelle']" [rows]="10" [paginator]="true"
+                         [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                         selectionMode="multiple" [rowHover]="true" dataKey="id">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <button pButton pRipple label="Ajouter un Menu" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
+                            </span>
+
+
+                        </div>
+                        <div *ngIf="creeMenu">
+                            <form name="editForm" role="form" novalidate #editForm="ngForm">
+                                <div class="field" style="margin-top: 20px; display: flex;align-items: center; gap: 5px;">
+                                    <input type="text" pInputText id="code" placeholder="code" [ngModelOptions]="{standalone: true}" [(ngModel)]="menuAction.code" required autofocus [ngClass]="{'ng-invalid ng-dirty': submitted && !menuAction.code}" />
+                                    <input type="text" pInputText id="libelle" placeholder="libelle" [ngModelOptions]="{standalone: true}" [(ngModel)]="menuAction.libelle" required autofocus [ngClass]="{'ng-invalid ng-dirty': submitted && !menuAction.libelle}" />
+
+                                    <p-button label="Save" type="submit" icon="pi pi-save" [disabled]="editForm.invalid ?? true" (click)="saveMenuAction()"/>
+                                    <button  pButton pRipple class="p-button-info" label="Annuler" (click)="annulerMenu()" ></button>
+                                    <button  pButton pRipple class="p-button-danger" label="Fermer" (click)="closeMenu()" ></button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 3rem">
+                                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                            </th>
+                            <th pSortableColumn="code">Code <p-sortIcon field="code"></p-sortIcon></th>
+                            <th pSortableColumn="libelle">Libelle <p-sortIcon field="libelle"></p-sortIcon></th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-menuAction>
+
+                        <tr>
+                            <td>
+                                <p-tableCheckbox [value]="menuAction"></p-tableCheckbox>
+                            </td>
+                            <td style="width:50%; min-width:10rem;"><span class="p-column-title">Code</span>
+                                {{menuAction.code }}
+                            </td>
+                            <td style="width:50%; min-width:10rem;">
+                                <span class="p-column-title">Pays</span>
+                                {{menuAction.libelle}}
+                            </td>
+
+
+
+                            <td>
+
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+                <br>
+                <div class="flex  gap-2">
+
+                    <button  pButton pRipple class="p-button-danger" label="Annuler"  ></button>
+                    <button pButton pRipple class="p-button-success"[disabled]="!moduleParam.code || !moduleParam.libelle" label="Enregistrer" (click)="saveModuleParam()"></button>
+                </div>
+
+
+            </form>
+        </div>
+        <p-toast [style]="{marginTop: '80px'}" position="top-center"></p-toast>
+        <p-dialog [(visible)]="deleteModuleParamDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="moduleParam">Voulez-vous supprimer <b>{{moduleParam.libelle}}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Non" (click)="deleteModuleParamDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Oui" (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+        <p-dialog [(visible)]="deleteModuleParamDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="moduleParam">Are you sure you want to delete <b>{{moduleParam.libelle}}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Non" (click)="deleteModuleParamDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Oui" (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+
+
+    </div>
+
+
+</div>

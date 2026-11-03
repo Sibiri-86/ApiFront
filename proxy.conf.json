@@ -1,0 +1,12 @@
+[
+  {
+    "context": [
+      "/**",
+      "!/admin/**"
+    ],
+    "target": "http://localhost:8093",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+]

@@ -1,0 +1,182 @@
+<div class="h-screen flex justify-content-center align-items-center login-bg">
+  <div class="align-self-center mt-auto mb-auto">
+
+    <div class="login-card">
+
+      <!-- HEADER -->
+      <div class="login-header">
+        <div class="logo-wrap">
+          <img src="assets/images/dgi.png" height="56px" alt="DGI">
+        </div>
+        <h2>Bienvenue sur API</h2>
+        <p>Vérification et consultation des paiements d'impôts</p>
+        <div class="wave-divider">
+          <svg viewBox="0 0 380 32" preserveAspectRatio="none" height="32">
+            <path d="M0 0 Q95 32 190 16 Q285 0 380 24 L380 32 L0 32Z" fill="white" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="login-body">
+
+        <!-- Message d'erreur -->
+        <div *ngIf="authenticationError()" class="error-banner">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ errorMessage() }}
+        </div>
+
+        <form (ngSubmit)="login()" [formGroup]="form">
+
+          <!-- Matricule -->
+          <div class="field-group">
+            <label>Login</label>
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-user"></i>
+              <input type="text" pInputText class="w-full" placeholder="Saisir votre identifiant"
+                formControlName="username" [class.ng-invalid]="hasFieldError('username')"
+                [class.ng-dirty]="hasFieldError('username')" />
+            </span>
+            <small class="field-error" *ngIf="hasFieldError('username')">
+              {{ getFieldError('username') }}
+            </small>
+          </div>
+
+          <!-- Mot de passe -->
+          <div class="field-group">
+            <label>Mot de passe</label>
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-lock"></i>
+              <input type="password" pInputText class="w-full" placeholder="••••••••" formControlName="password"
+                [class.ng-invalid]="hasFieldError('password')" [class.ng-dirty]="hasFieldError('password')" />
+            </span>
+            <small class="field-error" *ngIf="hasFieldError('password')">
+              {{ getFieldError('password') }}
+            </small>
+          </div>
+
+          <!-- Mot de passe oublié -->
+          <div class="forgot-wrap">
+            <button type="button" class="forgot-btn" (click)="ouvrirModal()">
+              Mot de passe oublié ?
+            </button>
+          </div>
+
+          <!-- Bouton connexion -->
+          <button pButton pRipple type="submit" class="w-full btn-connect" label="Se connecter" icon="pi pi-sign-in"
+            [loading]="isLoading()" [disabled]="isLoading()">
+          </button>
+
+        </form>
+
+        <!-- Modules -->
+        <div class="modules-divider">
+          <hr><span>Modules disponibles</span>
+          <hr>
+        </div>
+
+        <div class="modules-grid">
+          <div class="module-item blue">
+            <i class="pi pi-car"></i>
+            <span>TVM</span>
+          </div>
+          <div class="module-item amber">
+            <i class="pi pi-building"></i>
+            <span>Taxe de Résidence</span>
+          </div>
+          <div class="module-item teal">
+            <i class="pi pi-wallet"></i>
+            <span>Impôt</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="login-footer">
+        <span>Direction Générale des Impôts</span>
+        <span class="version-badge">v2.0</span>
+      </div>
+
+
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- MODALE MOT DE PASSE OUBLIÉ -->
+<!-- ============================================================ -->
+<p-dialog [visible]="modalMotDePasseOublieOuvert()" (visibleChange)="modalMotDePasseOublieOuvert.set($event)"
+  [modal]="true" [closable]="true" [style]="{width: '28rem'}" [draggable]="false" [resizable]="false"
+  styleClass="border-round-md">
+
+  <ng-template pTemplate="header">
+    <div class="flex flex-column align-items-center text-center w-full">
+      <div class="bg-primary-100 p-3 border-round-circle mb-3">
+        <i class="pi pi-key text-primary text-2xl"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-300 m-0">Mot de passe oublié ?</h3>
+    </div>
+  </ng-template>
+
+  <!-- Succès -->
+  <div *ngIf="resetPasswordSuccess()" class="mb-4 p-3 bg-green-50 border-left-3 border-green-500 border-round">
+    <div class="flex align-items-start">
+      <i class="pi pi-check-circle text-green-500 mr-3 text-xl"></i>
+      <div class="flex-1">
+        <p class="text-green-700 font-semibold m-0 mb-1">Email envoyé avec succès !</p>
+        <p class="text-green-600 text-sm m-0">
+          Un lien de réinitialisation a été envoyé à votre adresse e-mail.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Erreur -->
+  <div *ngIf="resetPasswordError()" class="mb-4 p-3 bg-red-50 border-left-3 border-red-500 border-round">
+    <div class="flex align-items-start">
+      <i class="pi pi-exclamation-circle text-red-500 mr-3 text-xl"></i>
+      <div class="flex-1">
+        <p class="text-red-700 text-sm m-0">{{ resetPasswordError() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-600 text-center mb-4" *ngIf="!resetPasswordSuccess()">
+    Entrez votre matricule ci-dessous et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+  </p>
+
+  <form [formGroup]="resetPasswordForm" (ngSubmit)="envoyerLienReinitialisation()" class="flex flex-column gap-3"
+    *ngIf="!resetPasswordSuccess()">
+
+    <div>
+      <label for="reset-matricule" class="block text-900 font-medium mb-2">Matricule</label>
+      <span class="p-input-icon-left w-full">
+        <i class="pi pi-id-card text-500"></i>
+        <input id="reset-matricule" formControlName="matricule" type="text" pInputText class="w-full"
+          placeholder="Saisir votre matricule" [class.ng-invalid]="hasFieldError('matricule', resetPasswordForm)"
+          [class.ng-dirty]="hasFieldError('matricule', resetPasswordForm)">
+      </span>
+      <small class="text-red-600 block mt-1" *ngIf="hasFieldError('matricule', resetPasswordForm)">
+        {{ getFieldError('matricule', resetPasswordForm) }}
+      </small>
+    </div>
+
+    <div class="flex gap-2 mt-2">
+      <button pButton pRipple type="button" label="Annuler" (click)="fermerModal()" [disabled]="isLoadingReset()"
+        class="flex-1 p-button-outlined p-button-secondary">
+      </button>
+      <button pButton pRipple type="submit" label="Envoyer" [loading]="isLoadingReset()"
+        [disabled]="resetPasswordForm.invalid || isLoadingReset()" class="flex-1">
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="resetPasswordSuccess()" class="text-center mt-3">
+    <button pButton pRipple type="button" label="Fermer" icon="pi pi-times" (click)="fermerModal()" class="w-full">
+    </button>
+  </div>
+
+</p-dialog>

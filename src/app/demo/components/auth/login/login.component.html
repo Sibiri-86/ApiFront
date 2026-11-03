@@ -1,0 +1,40 @@
+<div class="h-screen flex flex-column bg-cover" style="background: url('assets/layout/images/pages/login-bg.jpg')">
+    <div class=" shadow-2 bg-indigo-500 z-5 p-3 flex justify-content-between flex-row align-items-center">
+        <div class="ml-3 flex" routerLink="/">
+            <div>
+                <img class="h-2rem" src="assets/layout/images/logo2x.png" alt="" />
+            </div>
+        </div>
+        <div class="mr-3 flex">
+            <button pButton pRipple type="button" label="DASHBOARD" [routerLink]="['/']"
+                class="p-button-text p-button-plain text-white"></button>
+        </div>
+    </div>
+
+    <div class="align-self-center mt-auto mb-auto">
+        <div class="text-center z-5 flex flex-column border-1 border-round-md surface-border surface-card px-3">
+            <div class="-mt-5 text-white bg-cyan-700 border-round-md mx-auto px-3 py-1 border-1 surface-border">
+                <h2 class="m-0">LOGIN</h2>
+            </div>
+
+            <h4>Welcome</h4>
+
+            <div class="text-color-secondary mb-6 px-6">Please use the form to sign-in Ultima network</div>
+
+            <div class="w-full flex flex-column gap-3 px-3 pb-6">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-envelope"></i>
+                    <input type="text" class="w-full" pInputText placeholder="E-mail" />
+                </span>
+
+                <span class="p-input-icon-left">
+                    <i class="pi pi-key"></i>
+                    <input type="password" class="w-full" pInputText placeholder="Password" />
+                </span>
+                <button pButton pRipple class="w-full my-3 px-3" label="LOGIN" [routerLink]="['/']"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-config [minimal]="true"></app-config>

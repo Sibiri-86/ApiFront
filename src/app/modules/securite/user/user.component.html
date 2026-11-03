@@ -1,0 +1,520 @@
+<div class="grid">
+
+    <div class="col-12 md:col-12">
+        <p-table #dt styleClass=" p-datatable-gridlines p-datatable-sm p-datatable" [value]="users" [columns]="cols"
+            [rows]="5" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+            [globalFilterFields]="['agence.filiale.nom','agence.libelle', 'profil.libelle','login','lastName','firstName']"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [(selection)]="selectedusers" selectionMode="multiple" [rowHover]="true" dataKey="id">
+            <ng-template pTemplate="caption">
+                <div class="flex justify-content-between flex-column sm:flex-row">
+                    <div>
+                        <button pButton label="Nouvel utilisateur" class="p-button-success mr-2 mb-2" icon="pi pi-plus"
+                            (click)="addUser()"></button>
+                        <button pButton label="Gestion des profils" class="p-button-info mb-2" icon="pi pi-cog"
+                            (click)="addProfil()"></button>
+                    </div>
+                    <h5 class="p-button-outlined mb-2"></h5>
+                    <span class="p-input-icon-left mb-2">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" #filter (input)="onGlobalFilter(dt, $event)"
+                            placeholder="Rechercher" class="w-full" />
+                    </span>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+
+                    <th style="font-weight: bold;">Profil
+                        <p-columnFilter type="text" display="menu" field="profil.libelle"></p-columnFilter>
+
+                    </th>
+                    <th style="font-weight: bold;">Matricule
+                        <p-columnFilter type="text" display="menu" field="login"></p-columnFilter>
+                    </th>
+
+                    <th style="font-weight: bold;">Nom
+                        <p-columnFilter type="text" display="menu" field="lastName"></p-columnFilter>
+                    </th>
+                    <th style="font-weight: bold;">Prénom(s)
+                        <p-columnFilter type="text" display="menu" field="firstName"></p-columnFilter>
+                    </th>
+                    <th style="font-weight: bold;">Status
+                    </th>
+
+                    <th style="font-weight: bold;">Action</th>
+                </tr>
+
+            </ng-template>
+
+            <ng-template pTemplate="body" let-user>
+                <tr [pSelectableRow]="user">
+
+
+                    <td class="table-separator ">{{user.profil?.libelle}}</td>
+                    <td class="table-separator">{{user.login }}</td>
+                    <td class="table-separator"> {{user.lastName}}</td>
+                    <td class="table-separator"> {{user.firstName}}</td>
+                    <td class="table-separator"
+                        [ngClass]="{'activated': user.activated, 'not-activated': !user.activated}">
+                        {{ user.activated ? 'ACTIF' : 'INACTIF' }}
+                    </td>
+                    <td class="text-right">
+                        <p-splitButton appendTo="body" *ngIf="!user.activated" label="Action"
+                            (click)="selectedItem = user" [model]="items" text styleClass="p-button-primary"
+                            severity="danger"></p-splitButton>
+
+                        <p-splitButton appendTo="body" *ngIf="user.activated" label="Action"
+                            (click)="selectedItem = user" [model]="itemsNoActif" text styleClass="p-button-primary"
+                            severity="danger"></p-splitButton>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage" let-columns>
+                <tr>
+                    <td colspan="8" style="text-align: center; font-size: 1.2em; color: red; font-weight: bold;"><span
+                            class="text-danger"> Aucun utilisateur trouvé ! </span></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+
+    <p-dialog [(visible)]="display" position="top" [modal]="true" [style]="{width:'75%'}" [responsive]="true"
+        header="Nouvel utilisateur ({{user.login}})" [modal]="true">
+
+
+        <form>
+            <div class="p-fluid grid mt-2">
+
+                <div class="col-6">
+                    <label class="w-full">Profil <span style="color: red !important; size: 1.4em;"
+                            class="required">*</span></label>
+                    <p-dropdown [options]="profils" name="profil" [(ngModel)]="user.profil" [showClear]="true"
+                        [ngModelOptions]="{standalone: true}" [filter]="true" [style]="{width:'100%'}"
+                        filterBy="libelle" placeholder="Selectionnez profil" optionLabel="libelle" appendTo="body"
+                        class="multiselect-custom" display="chip">
+
+                    </p-dropdown>
+                </div>
+               
+
+                <div class="col-6">
+                    <label class="w-full">Nom <span style="color: red !important; size: 1.4em;"
+                            class="required">*</span></label>
+                    <input type="text" pInputText id="lastName"  [(ngModel)]="user.lastName"
+                        [ngModelOptions]="{standalone: true}" style="width: 100%" required autofocus />
+                </div>
+                <div class="col-6">
+                    <label class="w-full">Prenom <span style="color: red !important; size: 1.4em;"
+                            class="required">*</span></label>
+                    <input type="text" pInputText id="firstName"  [(ngModel)]="user.firstName"
+                        [ngModelOptions]="{standalone: true}" style="width: 100%" required autofocus />
+
+                </div>
+                <div class="col-6">
+                    <label class="w-full">Email <span style="color: red !important; size: 1.4em;"
+                            class="required">*</span></label>
+                    <input type="emailAddress" pInputText id="emailAddress" [disabled]="!user.lastName" minlength="5"
+                        maxlength="254" [(ngModel)]="user.emailAddress" [ngModelOptions]="{standalone: true}"
+                        style="width: 100%" required autofocus />
+                </div>
+
+
+
+            </div>
+        </form>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple class="p-button-success ml-2" icon="pi pi-save" [disabled]="!user.lastName || !user.emailAddress
+                            ||!user.profil ||!user.firstName " label="Enregistrer" (click)="saveUser()"></button>
+            <button pButton pRipple class="p-button-danger" icon="pi pi-times" label="Annuler"
+                (click)="annuler()"></button>
+
+        </ng-template>
+
+
+    </p-dialog>
+
+
+    <p-dialog position="top" header="Réunitialiser le mot de passe" [modal]="true" [(visible)]="visible"
+        [style]="{ width: '35rem' }">
+        <br />
+        <div>
+            <!-- <div class="flex align-items-center gap-3 mb-3">
+                <label for="username" class="font-semibold w-6rem">Ancien mot de passe</label>
+                <input pInputText id="ancien" name="ancien" [(ngModel)]="ancien" class="flex-auto" autocomplete="off" />
+            </div> -->
+            <div class="flex align-items-center gap-3 mb-5">
+                <label for="newPassword" class="font-semibold w-6rem">Nouveau mot de passe</label>
+                <div class="col-10">
+                    <p-password class="font-semibold w-full" name="newPassword" minlength="8" #password="ngModel"
+                        [(ngModel)]="newPassword" [toggleMask]="true" class="w-full" styleClass="w-full"
+                        [inputStyle]="{'width':'100%'}" class="ng-invalid ng-dirty" placeholder="nouveau mot de passe"
+                        id="newPassword">
+                    </p-password>
+                </div>
+            </div>
+
+            <div class="flex  gap-2">
+                <button pButton pRipple class="p-button-success ml-2" icon="pi pi-save"
+                    [disabled]="!newPassword  || password.invalid " label="Enregistrer"
+                    (click)="renitialise()"></button>
+                <button pButton pRipple class="p-button-danger" icon="pi pi-times" label="Annuler"
+                    (click)="visible = false"></button>
+
+            </div>
+
+        </div>
+    </p-dialog>
+    <p-toast [style]="{marginTop: '80px'}" position="top-center"></p-toast>
+    <p-dialog [(visible)]="deleteuserDialog" header="Confirmation" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+            <span *ngIf="user">Voulez-vous supprimer <b>{{user.lastName}} {{user.firstName}} </b>?</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple class="p-button-warning" icon="pi pi-check" label="Valider"
+                (click)="confirmDelete()"></button>
+            <button pButton pRipple class="p-button-danger" icon="pi pi-times" label="Annuler"
+                (click)="deleteuserDialog = false"></button>
+
+        </ng-template>
+    </p-dialog>
+
+
+
+
+
+    <p-dialog [(visible)]="userD" position="top" header="Détail de l'utilisateur {{detailUser.login}}" [modal]="true"
+        [style]="{width:'60%'}">
+
+        <div class="p-fluid grid mt-2 ">
+            <div class="field col-12 md:col-3"><span class="font-bold">Profile: </span>
+                {{detailUser.profil?.libelle}}
+            </div>
+            <div class="field col-12 md:col-3"><span class="font-bold">Nom: </span> {{detailUser.firstName}}
+            </div>
+            <div class="field col-12 md:col-3"><span class="font-bold">Prénom: </span> {{detailUser.lastName}}
+            </div>
+            <div class="field col-12 md:col-3"><span class="font-bold">Email: </span>{{detailUser.emailAddress}}
+            </div>
+            <div class="field col-12 md:col-3"><span class="font-bold">Login: </span>{{detailUser.login}}
+            </div>
+
+
+            <div class="field col-12 md:col-3"><span class="font-bold">Statut: </span><span
+                    [ngClass]="{'activated': detailUser.activated, 'not-activated': !detailUser.activated}">{{
+                    detailUser.activated ? 'ACTIF' : 'INACTIF' }}</span>
+            </div>
+        </div>
+        <div style="margin-bottom: 3px; border-bottom: 2px solid red;">
+            <button type="button" pButton label="Liste des droits de l'utilisateur" (click)="findUserMenu()"
+                class="p-button-success"></button>
+
+        </div>
+        <div *ngIf="op">
+            <!--  <p-overlayPanel  #op [showCloseIcon]="true"  [style]="{width: '56%'}"> -->
+            <!-- <ng-template pTemplate="content"> -->
+            <p-table #dt styleClass="p-datatable-responsive-demo p-datatable-gridlines p-datatable-sm p-datatable"
+                [value]="menus" [rows]="5" dataKey="id" sortMode="multiple" [globalFilterFields]="['code','libelle']"
+                [paginator]="true" [loading]="loading" dataKey="id" [filterDelay]="0">
+
+
+                <ng-template pTemplate="header">
+                    <tr>
+
+                        <th style="font-weight: bold;" pSortableColumn="menuActionCode">Code <p-sortIcon
+                                field="menuActionCode" />
+                            <p-columnFilter type="text" display="menu" field="menuActionCode"></p-columnFilter>
+                        </th>
+                        <th style="font-weight: bold;" pSortableColumn="menuActionLibelle">Libelle <p-sortIcon
+                                field="menuActionLibelle" />
+                            <p-columnFilter type="text" display="menu" field="menuActionLibelle"></p-columnFilter>
+                        </th>
+
+
+                    </tr>
+
+
+
+                </ng-template>
+
+
+
+                <ng-template pTemplate="body" let-agence>
+                    <tr [pSelectableRow]="agence">
+
+                        <td class="table-separator">{{agence.menuActionCode }}</td>
+
+                        <td class="table-separator"> {{agence.menuActionLibelle }}</td>
+
+
+
+
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr>
+                        <td colspan="8" style="text-align: center; font-size: 1.2em; color: red; font-weight: bold;">
+                            <span class="text-danger"> Aucun droit trouvé ! </span>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <!-- </ng-template> -->
+        </div>
+
+
+
+
+
+        <ng-template pTemplate="footer">
+            <button pButton pRipple class="p-button-danger" icon="pi pi-ban" label="Fermer" (click)="fermer()"></button>
+
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog [(visible)]="displayProfil" header="Gestion des profils " position="top" [modal]="true"
+        [style]="{width:'65%'}">
+
+
+        <p-table #dtProfile styleClass="p-datatable-gridlines p-datatable-sm p-datatable" [value]="profils" [rows]="4"
+            dataKey="id" sortMode="multiple" [globalFilterFields]="['code','libelle']" [paginator]="true"
+            [loading]="loading" dataKey="id" [filterDelay]="0">
+
+            <ng-template pTemplate="caption">
+                <div class="flex justify-content-between flex-column sm:flex-row">
+                    <button pButton label="Nouveau profil" class="p-button-success mb-2" icon="pi pi-plus"
+                        (click)="newProfil()"></button>
+
+                    <span class="p-input-icon-left mb-2">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" #filter (input)="onGlobalFilter(dtProfile, $event)"
+                            placeholder="Rechercher" class="w-full" />
+                    </span>
+                </div>
+
+
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+
+                    <th style="font-weight: bold;">Code <p-columnFilter type="text" field="code" display="menu"
+                            [matchMode]="'contains'"></p-columnFilter></th>
+                    <th style="font-weight: bold;">Libelle <p-columnFilter type="text" field="libelle"
+                            [matchMode]="'contains'" display="menu"></p-columnFilter></th>
+
+                    <th style="font-weight: bold;">Action</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-profil>
+                <tr [pSelectableRow]="profil">
+
+                    <td class="table-separator">{{profil.code }}</td>
+                    <td class="table-separator"> {{profil.libelle }}</td>
+
+
+                    <td class="text-right">
+
+
+                        <p-splitButton appendTo="body" label="Action" (click)="selectedProfilItem = profil"
+                            [model]="profilItems" text styleClass="p-button-primary" severity="danger"></p-splitButton>
+
+
+
+
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage" let-columns>
+                <tr>
+                    <td colspan="8" style="text-align: center; font-size: 1.2em; color: red; font-weight: bold;"><span
+                            class="text-danger"> Aucun profil trouvé ! </span></td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+
+        <ng-template pTemplate="footer">
+            <button pButton pRipple class="p-button-danger" icon="pi pi-ban" label="Fermer"
+                (click)="fermerGestionProfil()"></button>
+
+        </ng-template>
+
+
+    </p-dialog>
+
+    <p-dialog [(visible)]="isProfil" header="Détail du profile {{detailProfil.libelle}}" position="top" [modal]="true"
+        [style]="{width:'65%'}">
+        <div class="p-fluid grid mt-2">
+            <div class="field col-12 md:col-6"><span class="font-bold">Code: </span> {{detailProfil.code}}
+            </div>
+
+            <div class="field col-12 md:col-6"><span class="font-bold">Libelle: </span> {{detailProfil.libelle}}
+            </div>
+        </div>
+        <div style="margin-bottom: 3px; border-bottom: 2px solid red; ">
+            <button type="button" pButton label="Liste des droits" (click)="findDroitMenu()"
+                class="p-button-success"></button>
+
+        </div>
+        <div *ngIf="op2">
+
+            <p-table #dt [value]="menuActionsDetail" styleClass="p-datatable-gridlines" [columns]="cols"
+                responsiveLayout="scroll" [rows]="5" [globalFilterFields]="['menuActionCode','menuActionLibelle']"
+                [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [(selection)]="selectedMenus" selectionMode="multiple" [rowHover]="true" dataKey="id">
+                <!-- <ng-template pTemplate="caption">
+                            <div class="flex justify-content-between flex-column sm:flex-row">
+                                <h4 style="text-align: center"></h4>
+                                <span class="p-input-icon-left mb-2">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" #filter (input)="onGlobalFilter(dt, $event)" placeholder="Rechercher" class="w-full"/>
+                                </span>
+                            </div>
+                        </ng-template> -->
+                <ng-template pTemplate="header">
+                    <tr>
+
+                        <th>Code <p-columnFilter type="text" display="menu" field="menuActionCode"></p-columnFilter>
+                        </th>
+                        <th>Libelle <p-columnFilter type="text" display="menu"
+                                field="menuActionLibelle"></p-columnFilter></th>
+                        <!-- <th pSortableColumn="moduleParamLibelle">Module <p-columnFilter type="text" display="menu" field="moduleParamLibelle"  ></p-columnFilter></th> -->
+
+                    </tr>
+
+                </ng-template>
+                <ng-template pTemplate="body" let-menuAction>
+
+                    <tr>
+
+                        <td>
+                            {{menuAction.menuActionCode }}
+                        </td>
+                        <td>
+                            {{menuAction.menuActionLibelle}}
+                        </td>
+                        <!--  <td style="width:40%; min-width:10rem;">
+                                    {{menuAction.moduleParamLibelle}}
+                                </td> -->
+
+
+
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <button pButton pRipple class="p-button-danger" icon="pi pi-ban" label="Fermer"
+                (click)="fermerProfil()"></button>
+
+        </ng-template>
+    </p-dialog>
+    <p-dialog [(visible)]="addNewProfil" header="Nouveau profil" position="top" [modal]="true" [style]="{width:'65%'}">
+
+        <div class="p-fluid grid mt-2">
+
+            <div class="col-12 md:col-6">
+                <label for="libelle" class="w-full">Code <span style="color: red !important; size: 1.4em;"
+                        class="required">*</span></label>
+                <input type="text" pInputText style="width: 100%" placeholder="code" id="code" [(ngModel)]="profil.code"
+                    [ngModelOptions]="{standalone: true}" required autofocus />
+
+            </div>
+            <div class="col-12 md:col-6">
+                <label for="libelle" class="w-full">Libelle <span style="color: red !important; size: 1.4em;"
+                        class="required">*</span></label>
+                <input type="text" pInputText [disabled]="!profil.code" id="libelle" placeholder="libelle"
+                    style="width: 100%" [(ngModel)]="profil.libelle" [ngModelOptions]="{standalone: true}" required
+                    autofocus />
+
+            </div>
+        </div>
+        <div style="margin-bottom: 3px; border-bottom: 2px solid red; ">
+            <h4>Sélectionnez les droits</h4>
+        </div>
+        <p-table #dtProfil [value]="menuActions" styleClass="p-datatable-gridlines p-datatable-sm p-datatable"
+            [columns]="cols" responsiveLayout="scroll" [rows]="5"
+            [globalFilterFields]="['code','libelle', 'moduleParamLibelle']" [paginator]="true"
+            [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [(selection)]="selectedMenus" selectionMode="multiple" [rowHover]="true" dataKey="id">
+            <ng-template pTemplate="caption">
+                <div class="flex justify-content-between flex-column sm:flex-row">
+                    <h5 class="p-button-outlined mb-2"></h5>
+                    <span class="p-input-icon-left mb-2">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" #filter (input)="onGlobalFilter(dtProfil, $event)"
+                            placeholder="Rechercher" class="w-full" />
+                    </span>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 3rem">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    </th>
+                    <th>Code <p-columnFilter type="text" display="menu" field="menuActionCode"></p-columnFilter></th>
+                    <th>Libelle <p-columnFilter type="text" display="menu" field="menuActionLibelle"></p-columnFilter>
+                    </th>
+                    <th>Module <p-columnFilter type="text" display="menu" field="moduleParamLibelle"></p-columnFilter>
+                    </th>
+
+                </tr>
+
+            </ng-template>
+            <ng-template pTemplate="body" let-menuAction>
+
+                <tr>
+                    <td>
+                        <p-tableCheckbox [value]="menuAction"></p-tableCheckbox>
+                    </td>
+                    <td style="width:25%; min-width:10rem;">
+                        {{menuAction.code }}
+                    </td>
+                    <td style="width:35%; min-width:10rem;">
+                        {{menuAction.libelle}}
+                    </td>
+                    <td style="width:40%; min-width:10rem;">
+                        {{menuAction.moduleParamLibelle}}
+                    </td>
+
+
+
+                </tr>
+            </ng-template>
+        </p-table>
+        <br>
+        <!--                        >
+ -->
+        <ng-template pTemplate="footer">
+            <button pButton pRipple class="p-button-success ml-2" icon="pi pi-save"
+                [disabled]="!profil.code || !profil.libelle" label="Enregistrer" (click)="saveProfil()"></button>
+            <button pButton pRipple class="p-button-danger" icon="pi pi-times" label="Annuler"
+                (click)="annulerProfile()"></button>
+
+        </ng-template>
+    </p-dialog>
+
+
+    <p-dialog [(visible)]="deleteprofilDialog" header="Confirmation" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+            <span *ngIf="user">Voulez-vous supprimer <b>{{profil.libelle}} </b>?</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple class="p-button-warning" icon="pi pi-check" label="Valider"
+                (click)="confirmProfilDelete()"></button>
+            <button pButton pRipple class="p-button-danger" icon="pi pi-times" label="Annuler"
+                (click)="deleteprofilDialog = false"></button>
+
+        </ng-template>
+    </p-dialog>
+</div>
+<app-loading-spinner></app-loading-spinner>

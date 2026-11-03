@@ -1,0 +1,164 @@
+<div class="layout-topbar">
+    <div class="layout-topbar-start">
+        <a class="layout-topbar-logo" routerLink="/">
+            <img src="/assets/layout/images/dgi-bon.png" width="50px" alt="">
+            <span style="color: white;"> API </span>
+        </a>
+        <a #menuButton class="layout-menu-button" (click)="onMenuButtonClick()" pRipple>
+            <i class="pi pi-chevron-right"></i>
+        </a>
+
+        <a #mobileMenuButton class="layout-topbar-mobile-button" (click)="onMobileTopbarMenuButtonClick()" pRipple>
+            <i class="pi pi-ellipsis-v"></i>
+        </a>
+    </div>
+
+    <div class="layout-topbar-end">
+        <div class="layout-topbar-actions-start">
+
+        </div>
+        <div class="layout-topbar-actions-end">
+            <ul class="layout-topbar-items">
+                <li class="layout-topbar-search">
+                    <a pStyleClass="@next" enterFromClass="ng-hidden" enterActiveClass="px-scalein"
+                        leaveToClass="ng-hidden" leaveActiveClass="px-fadeout" [hideOnOutsideClick]="true" pRipple
+                        (click)="focusSearchInput()">
+                        <i class="pi pi-search"></i>
+                    </a>
+
+                    <div class="layout-search-panel ng-hidden p-input-filled">
+                        <i class="pi pi-search"></i>
+                        <input #searchInput type="text" pInputText placeholder="Search">
+                        <button pButton pRipple type="button" icon="pi pi-times"
+                            class="p-button-rounded p-button-text p-button-plain" pStyleClass=".layout-search-panel"
+                            leaveToClass="ng-hidden" leaveActiveClass="px-fadeout"></button>
+                    </div>
+                </li>
+                <li>
+                    <a pStyleClass="@next" enterFromClass="ng-hidden" enterActiveClass="px-scalein"
+                        leaveToClass="ng-hidden" leaveActiveClass="px-fadeout" [hideOnOutsideClick]="true" pRipple>
+                        <i class="pi pi-bell"></i>
+                    </a>
+                    <div class="ng-hidden">
+                        <ul class="list-none p-0 m-0">
+                            <li class="px-3 py-1">
+                                <span>il n'y pas de notification <b>0</b></span>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+
+                <li>
+                    <a pStyleClass="@next" enterFromClass="ng-hidden" enterActiveClass="px-scalein"
+                        leaveToClass="ng-hidden" leaveActiveClass="px-fadeout" [hideOnOutsideClick]="true" pRipple>
+                        <img src="assets/demo/images/avatar/amyelsner.png" alt="avatar" class="w-2rem h-2rem">
+                    </a>
+                    <div class="ng-hidden">
+
+                        <ul class="list-none p-0 m-0">
+
+                            <li class="p-3">
+                                <div class="flex align-items-center">
+                                    <!-- <img src="assets/demo/images/avatar/avatar-1.png" /> -->
+                                    <div class="flex flex-column ml-3 flex-1">
+                                        <div class="flex align-items-center justify-content-between mb-1">
+                                            <span class="font-bold">{{user?.firstName}} {{user?.lastName}}</span>
+                                        </div>
+                                       <span class="text-sm line-height-3">{{user?.profil?.libelle}} </span> 
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap">
+                                    <div class="w-6 flex flex-column align-items-center p-3">
+                                        <button pButton class="p-button-success mb-2" (click)="reunitialise()"
+                                            icon="pi pi-user-edit" pRipple></button>
+                                        <span>Mot de passe</span>
+                                    </div>
+                                    <div class="w-6 flex flex-column align-items-center p-3">
+                                        <button pButton class="p-button-danger mb-2" icon="pi pi-power-off"
+                                            (click)="logout()" pRipple></button>
+                                        <span>Déconnecter</span>
+                                    </div>
+                                </div>
+
+                            </li>
+
+
+
+                            <!--  <li class="px-3 py-1">
+                                <span>il n'y pas de notification <b>{{account?.login}}</b></span>
+                            </li> -->
+                            <!--  <li>
+                                <a class="cursor-pointer flex align-items-center py-2 hover:surface-hover transition-duration-150 transition-all px-3 py-2" pRipple>
+                                    <i class="pi pi-cog mr-2"></i>
+                                    <span>Parametrage</span>
+                                </a>
+                            </li> -->
+
+                            <!--  <li>
+                                <a class="cursor-pointer flex align-items-center py-2 hover:surface-hover transition-duration-150 transition-all px-3 py-2" (click)="logout()" pRipple>
+                                    <i class="pi pi-power-off mr-2"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </li> -->
+                        </ul>
+                    </div>
+
+                </li>
+                <li>
+
+
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <p-dialog [(visible)]="display" header="Modification du mot de passe" [modal]="true" [style]="{width:'25%'}">
+        <div class="flex flex-wrap">
+            <form>
+                <div class="grid">
+                    <div class="col-12">
+                        <label class="w-full">Nouveau mot de passe <span style="color: red !important; size: 1.4em;"
+                                class="required">*</span></label>
+                        <br />
+                        <p-password name="newPass" minlength="8" #password="ngModel" [(ngModel)]="newPass"
+                            [toggleMask]="true" class="w-full" styleClass="w-full" [inputStyle]="{'width':'100%'}"
+                            class="ng-invalid ng-dirty" placeholder="nouveau mot de passe" id="newPass">
+                        </p-password>
+
+                    </div>
+
+                    <div class="col-12">
+                        <label class="w-full">Confirmation du nouveau mot de passe <span
+                                style="color: red !important; size: 1.4em;" class="required">*</span></label><br />
+                        <p-password class="w-full" name="ancienPass" [(ngModel)]="ancienPass" #confirmpassword="ngModel"
+                            [pattern]="newPass" [toggleMask]="true" styleClass="w-full" [inputStyle]="{ width: '100%' }"
+                            placeholder="Confirmer le mot de passe" id="ancienPass">
+                        </p-password>
+
+
+
+                    </div>
+
+                    <br>
+                    <div class="flex flex-row-reverse  gap-2">
+                        <button pButton pRipple class="p-button-success ml-2" icon="pi pi-save"
+                            [disabled]="!newPass|| !ancienPass  || confirmpassword.invalid " label="Enregistrer"
+                            (click)="enregistrer()"></button>
+                        <button pButton pRipple class="p-button-danger" icon="pi pi-times" label="Annuler"
+                            (click)="annuler()"></button>
+
+                    </div>
+
+                </div>
+            </form>
+
+
+
+
+        </div>
+
+    </p-dialog>
+</div>

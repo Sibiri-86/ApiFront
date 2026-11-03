@@ -1,0 +1,3 @@
+<ng-container *ngIf="formGroup.controls[entityField].touched && formGroup.controls[entityField].errors">
+    <small class="p-error">{{getErrorMessage(formGroup.controls[entityField].errors)}}</small>
+  </ng-container>

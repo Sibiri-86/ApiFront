@@ -1,0 +1,21 @@
+<div class="layout-container" [ngClass]="containerClass">
+
+    <app-topbar *ngIf="authService.isAuthenticated()"></app-topbar>
+    <app-rightmenu *ngIf="authService.isAuthenticated()"></app-rightmenu>
+    <app-sidebar *ngIf="authService.isAuthenticated()"></app-sidebar>
+    <div class="layout-content" *ngIf="!authService.isAuthenticated()">
+        <router-outlet></router-outlet>
+    </div>
+    <div class="layout-content-wrapper" *ngIf="authService.isAuthenticated()">
+        <app-breadcrumb ></app-breadcrumb>
+
+        <div class="layout-content">
+            <router-outlet></router-outlet>
+        </div>
+
+        <app-footer *ngIf="authService.isAuthenticated()"></app-footer>
+    </div>
+    <!-- <app-config></app-config> -->
+
+    <div *ngIf="layoutService.state.staticMenuMobileActive" class="layout-mask"></div>
+</div>

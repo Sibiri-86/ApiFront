@@ -1,0 +1,183 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="Menu" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                        <button pButton pRipple label="Supprimer" icon="pi pi-trash" class="p-button-danger" (click)="deleteSelectedMenuActions()" [disabled]="!selectedMenuActions || !selectedMenuActions.length"></button>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table #dt [value]="menuActions" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['libelle','code']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedMenuActions" selectionMode="multiple" [rowHover]="true" dataKey="menuActionId">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Liste des menus</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." class="w-full sm:w-auto" />
+                        </span>
+<div  class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card flex justify-content-between align-items-center">
+                <div class="p-2 h-full w-full flex flex-column justify-content-between">
+                    <div class="flex align-items-center justify-content-between mb-3">
+                        <div class="p-col-6">
+                            <h5>Menu action</h5>
+                            <p>Il s'agit de la gestion des <mark>menus</mark>.</p>
+                        </div>
+                        <div *ngIf="creeMenu">
+                            <form name="editForm" role="form" novalidate #editForm="ngForm">
+                                <div class="field" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                                    <input type="text" pInputText id="libelle" placeholder="libelle" [ngModelOptions]="{standalone: true}" [(ngModel)]="menuAction.libelle" required autofocus [ngClass]="{'ng-invalid ng-dirty': submitted && !menuAction.libelle}" />
+                                    <input type="text" pInputText id="code" placeholder="code" [ngModelOptions]="{standalone: true}" [(ngModel)]="menuAction.code" required autofocus [ngClass]="{'ng-invalid ng-dirty': submitted && !menuAction.code}" />
+
+                                    <p-button label="Save" type="submit" icon="pi pi-save" [disabled]="editForm.invalid ?? true" (click)="saveMenuAction()"/>
+                                </div>
+
+                            </form>
+                        </div>
+                        <div class="flex align-items-center gap-2 ">
+                            <button  pButton pRipple label="Ajouter" icon="pi pi-plus-circle" (click)="creerMenu()"></button>
+                            <!--                            <button  pButton pRipple label="Ajouter" icon="pi pi-plus-circle" (click)="addModePassation()"></button>-->
+                            <button pButton pRipple label="Suppression" icon="pi pi-trash"
+                                    [disabled]="selectedMenuActions.length<2"
+                                    class="p-button-danger" (click)="deleteSelectedMenuActions()">
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="container-fluid">
+
+            <div class="table-responsive">
+
+
+                <div class="col-12">
+
+                    <p-table #dt styleClass="p-datatable-responsive-demo p-datatable-sm p-datatable"
+
+                             [value]="menuActions"
+                             [rows]="20" dataKey="id"
+                             [(selection)]="selectedMenuActions"
+                             sortMode="multiple"
+                             [globalFilterFields]="['libelle','code']"
+                             [paginator]="true"
+                             [loading]="loading"
+                             scrollHeight="600px"
+                             dataKey="id"
+                             [filterDelay]="0">
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 3em">
+                                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                                </th>
+                                <th style="font-weight: bold;">Libellé</th>
+                                <th style="font-weight: bold;">Code</th>
+                                <th style="font-weight: bold;">Action</th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-menuAction>
+                            <tr [pSelectableRow]="menuAction">
+                                <td>
+                                    <p-tableCheckbox [value]="menuActions"></p-tableCheckbox>
+                                </td>
+
+                                <td class="table-separator">{{menuAction.libelle}}</td>
+                                <td class="table-separator">{{menuAction.code}}</td>
+
+                                <td style="width:12%; min-width:10rem; border-left: none">
+                                    <button  type="button" pButton pRipple icon="pi pi-pencil"
+                                             class="p-button-rounded p-button-info mr-2"
+                                             (click)="editMenuAction(menuAction)">
+                                    </button>
+                                    <button  type="button" pButton pRipple icon="pi pi-trash"
+                                             class="p-button-rounded p-button-warning mr-2"
+                                             (click)="deleteMenuAction(menuAction)">
+
+                                    </button>
+
+
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage" let-columns>
+                            <tr>
+                                <td colspan="8"
+                                    style="text-align: center; font-size: 1.2em; color: red; font-weight: bold;"><span
+                                    class="text-danger"> Aucun menu trouvé ! </span></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+
+                </div>
+
+
+
+            </div>
+
+            <p-toast [style]="{marginTop: '80px'}" position="top-center"></p-toast>
+        </div>
+
+
+
+        <p-dialog header="Suppression de plusieurs produits" [(visible)]="deleteMenuActionsDialog" [modal]="true" [responsive]="true" [style]="{width: '50%', minWidth: '50%'}" [minY]="70" [maximizable]="true" [baseZIndex]="10000">
+
+            <div class="col-12">
+                <div class="card">
+                    <p-table #dt styleClass="p-datatable-responsive-demo p-datatable-sm p-datatable"
+
+                             [value]="menuActions"
+                             [rows]="20" dataKey="id"
+
+                             sortMode="multiple"
+                             [paginator]="true"
+                             [loading]="loading"
+                             scrollHeight="600px"
+                             dataKey="id"
+                             [filterDelay]="0">
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="font-weight: bold;">Libelle</th>
+                                <th style="font-weight: bold;">Code</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-produit>
+                            <tr [pSelectableRow]="produit">
+
+                                <td class="table-separator">{{menuAction.libelle}}</td>
+                                <td class="table-separator">{{menuAction.code}}</td>
+                            </tr>
+                        </ng-template>
+
+                    </p-table>
+                    <p-footer class="justify_center mt-2">
+                        <button  type="button" class="p-button-cancel mr-3" pButton icon="pi pi-times"
+                                 label="Quitter" (click)="deleteMenuActionsDialog = false"></button>
+
+                        <button type="button" class="p-button-success" pButton icon="pi pi-check"
+                                label="Supprimer" (click)="confirmDeleteSelected()"></button>
+                    </p-footer>
+                </div>
+            </div>
+        </p-dialog>
+
+    </div>
+</div>
+</div>
+</ng-template>
+</p-table></div></div></div>
+

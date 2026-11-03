@@ -1,0 +1,20 @@
+<div class="module-details">
+  <h3>Détails du Module</h3>
+  
+  <div class="details-grid">
+    <div class="detail-row">
+      <span class="label">Code :</span>
+      <span class="value">{{ moduleParam.code }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="label">Produit :</span>
+      <span class="value">{{ moduleParam.libelle }}</span>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button type="button" pButton icon="pi pi-times" label="Fermer" 
+            class="p-button-secondary" (click)="close()">
+    </button>
+  </div>
+</div>

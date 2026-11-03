@@ -1,0 +1,727 @@
+<p-toast></p-toast>
+
+<div class="grid">
+    <!-- Barre de recherche et filtres -->
+    <div class="col-12">
+        <div class="card">
+            <h4 class="mb-3">Registre des Courriers</h4>
+
+            <form [formGroup]="registreForm">
+                <div class="grid">
+                    <!-- Période -->
+                    <div class="col-12 md:col-3">
+                        <label for="dateDebut" class="form-control-label mr-2">Du</label>
+                        <input type="date" pInputText formControlName="dateDebut" class="w-full">
+                    </div>
+
+                    <div class="col-12 md:col-3">
+                        <label for="dateFin" class="form-control-label mr-2">Au</label>
+                        <input type="date" pInputText formControlName="dateFin" class="w-full">
+                    </div>
+
+                    <!-- Type de courrier -->
+                    <div class="col-12 md:col-2">
+                        <label for="typeCourrier">Type</label>
+                        <p-dropdown
+                            [options]="typeOptions"
+                            formControlName="typeCourrier"
+                            placeholder="Tous"
+                            [showClear]="true"
+                            appendTo="body"
+                            styleClass="w-full">
+                        </p-dropdown>
+                    </div>
+
+                    <!-- Sens (Entrant/Sortant) -->
+                    <div class="col-12 md:col-2">
+                        <label for="sourceDestination">Sens</label>
+                        <p-dropdown
+                            [options]="sensOptions"
+                            formControlName="sourceDestination"
+                            placeholder="Tous"
+                            [showClear]="true"
+                            appendTo="body"
+                            styleClass="w-full">
+                        </p-dropdown>
+                    </div>
+
+                    <!-- Bouton rechercher -->
+                    <div class="col-12 md:col-2 flex align-items-end">
+                        <button
+                            pButton
+                            pRipple
+                            class="p-button-success w-full"
+                            icon="pi pi-search"
+                            label="Rechercher"
+                            (click)="rechercherCourriers()">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="col-12">
+        <div class="grid">
+            <div class="col-12 md:col-3">
+                <div class="card mb-0 surface-card">
+                    <div class="flex justify-content-between mb-3">
+                        <div>
+                            <span class="block text-500 font-medium mb-3">Total Courriers</span>
+                            <div class="text-900 font-medium text-xl">{{ statistiques.total }}</div>
+                        </div>
+                        <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                             style="width:2.5rem;height:2.5rem">
+                            <i class="pi pi-inbox text-blue-500 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-3">
+                <div class="card mb-0 surface-card">
+                    <div class="flex justify-content-between mb-3">
+                        <div>
+                            <span class="block text-500 font-medium mb-3">Courriers Entrants</span>
+                            <div class="text-900 font-medium text-xl">{{ statistiques.entrants }}</div>
+                        </div>
+                        <div class="flex align-items-center justify-content-center bg-orange-100 border-round"
+                             style="width:2.5rem;height:2.5rem">
+                            <i class="pi pi-arrow-down text-orange-500 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-3">
+                <div class="card mb-0 surface-card">
+                    <div class="flex justify-content-between mb-3">
+                        <div>
+                            <span class="block text-500 font-medium mb-3">Courriers Sortants</span>
+                            <div class="text-900 font-medium text-xl">{{ statistiques.sortants }}</div>
+                        </div>
+                        <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                             style="width:2.5rem;height:2.5rem">
+                            <i class="pi pi-arrow-up text-green-500 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-3">
+                <div class="card mb-0 surface-card">
+                    <div class="flex justify-content-between mb-3">
+                        <div>
+                            <span class="block text-500 font-medium mb-3">En Traitement</span>
+                            <div class="text-900 font-medium text-xl">{{ statistiques.enTraitement }}</div>
+                        </div>
+                        <div class="flex align-items-center justify-content-center bg-cyan-100 border-round"
+                             style="width:2.5rem;height:2.5rem">
+                            <i class="pi pi-sync text-cyan-500 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau du registre -->
+    <div class="col-12">
+        <div class="card">
+            <p-table
+                #dt
+                [value]="courriersRegistre"
+                [loading]="loading"
+                responsiveLayout="scroll"
+                [rows]="10"
+                [paginator]="true"
+                [rowsPerPageOptions]="[10, 25, 50, 100]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} courriers"
+                dataKey="id"
+                [globalFilterFields]="['numero', 'numeroReception', 'objet', 'destinateur.source', 'directionDestinateur.libelleCourtCdi']"
+                styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines">
+
+                <ng-template pTemplate="caption">
+                    <div class="flex justify-content-between flex-column sm:flex-row">
+                        <div class="flex gap-2">
+                            <button
+                                pButton
+                                label="Exporter PDF"
+                                icon="pi pi-file-pdf"
+                                class="p-button-danger"
+                                (click)="exportPDF()">
+                            </button>
+                            <button
+                                pButton
+                                label="Exporter Excel"
+                                icon="pi pi-file-excel"
+                                class="p-button-success"
+                                (click)="exportExcel()">
+                            </button>
+                        </div>
+
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                #filter
+                                (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                                placeholder="Rechercher dans le registre"
+                                class="w-full" />
+                        </span>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">#</th>
+                        <th pSortableColumn="numero">
+                            N° Courrier
+                        </th>
+
+                        <th pSortableColumn="dateReception">
+                            Date
+                        </th>
+                        <th pSortableColumn="typeCourrier">
+                            Type
+                        </th>
+                        <th pSortableColumn="sourceDestination">
+                            Sens
+                        </th>
+                        <th>Provenance/Destination</th>
+                        <th>Objet</th>
+                        <th style="width: 10rem" class="text-center">Actions</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-courrier let-rowIndex="rowIndex">
+                    <tr>
+                        <td>{{ rowIndex + 1 }}</td>
+                        <td>
+                            <span class="font-semibold">{{ courrier.numero }}</span>
+                        </td>
+                        <td>{{ courrier.dateReception | date: 'dd/MM/yyyy' }}</td>
+                        <td>
+                            <span
+                                class="badge"
+                                [ngClass]="{
+                                    'badge-primary': courrier.typeCourrier === 'INTERNE',
+                                    'badge-info': courrier.typeCourrier === 'EXTERNE'
+                                }">
+                                {{ courrier.typeCourrier === 'INTERNE' ? 'Inter DGI' : 'Externe' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span
+                                class="badge"
+                                [ngClass]="{
+                                    'badge-success': courrier.sourceDestination === 'ENTRANT',
+                                    'badge-warning': courrier.sourceDestination === 'SORTANT'
+                                }">
+                                <i
+                                    class="pi"
+                                    [ngClass]="{
+                                        'pi-arrow-down': courrier.sourceDestination === 'ENTRANT',
+                                        'pi-arrow-up': courrier.sourceDestination === 'SORTANT'
+                                    }">
+                                </i>
+                                {{ courrier.sourceDestination === 'ENTRANT' ? 'Entrant' : 'Sortant' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span *ngIf="courrier.destinateur">
+                                {{ courrier.destinateur?.source }}
+                            </span>
+                            <span *ngIf="courrier.directionDestinateur">
+                                {{ courrier.directionDestinateur?.libelleCourtCdi }}
+                            </span>
+                            <span *ngIf="courrier.sourceDirection">
+                                {{ courrier.sourceDirection?.source }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="text-overflow-ellipsis" style="max-width: 300px;" [title]="courrier.objet">
+                                {{ courrier.objet }}
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <button
+                                pButton
+                                pRipple
+                                icon="pi pi-eye"
+                                class="p-button-rounded p-button-text p-button-info"
+                                (click)="voirDetails(courrier)"
+                                pTooltip="Voir les détails"
+                                tooltipPosition="top">
+                            </button>
+
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="10" style="text-align: center; font-size: 1.2em; color: red; font-weight: bold;">
+                            <i class="pi pi-inbox text-4xl mb-3"></i>
+                            <div>Aucun courrier trouvé dans le registre</div>
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="summary">
+                    <div class="flex align-items-center justify-content-between">
+                        Total: {{ courriersRegistre ? courriersRegistre.length : 0 }} courrier(s)
+                    </div>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<!-- Dialog de détails du courrier -->
+<p-dialog [(visible)]="detailsDialog" [style]="{width: '1200px'}" [header]="popupHeader" [modal]="true"
+  [closable]="true" [draggable]="false" class="p-fluid">
+
+  <div class="p-fluid grid mt-2">
+    <!-- Informations de base du courrier -->
+    <div class="col-12">
+      <p-panel header="Informations générales" [toggleable]="true">
+        <div class="grid">
+          <div class="field col-12 md:col-4" *ngIf="courrierSelectionne.typeCourrier ==='EXTERNE'">
+            <span class="font-bold">Type: </span>
+            {{courrierSelectionne.sourceDestination}}
+          </div>
+          <div class="field col-12 md:col-4">
+            <span class="font-bold">N° courrier: </span>
+            {{courrierSelectionne.numero}}
+          </div>
+          <div class="field col-12 md:col-4" *ngIf="courrierSelectionne.sourceDestination =='ENTRANT'">
+            <span class="font-bold">N° reception: </span>
+            {{courrierSelectionne.numeroReception}}
+          </div>
+
+          <div class="field col-12 md:col-4">
+            <span class="font-bold">Statut: </span>
+            <p-tag [severity]="courrierSelectionne.isImputer ? 'success' : 'warning'"
+                   [value]="courrierSelectionne.isImputer ? 'Imputé' : 'Non imputé'">
+            </p-tag>
+          </div>
+          <div class="field col-12 md:col-4"
+            *ngIf="courrierSelectionne.typeCourrier ==='EXTERNE' && courrierSelectionne.sourceDirection">
+            <span class="font-bold">Service: </span>
+            {{courrierSelectionne?.sourceDirection?.source}}
+          </div>
+
+           <div class="field col-12 md:col-4" *ngIf="courrierSelectionne.typeCourrier ==='EXTERNE' && courrierSelectionne.destinateur">
+                <span class="font-bold">
+                {{ isEntrant ? 'Source :' : 'Destinataire :' }}
+              </span>
+            {{courrierSelectionne?.destinateur?.source}}
+         </div>
+
+         
+
+          <div class="field col-12 md:col-4">
+            <span class="font-bold">Date: </span>
+            {{courrierSelectionne.dateReception | date: 'dd/MM/yyyy'}}
+          </div>
+           <div class="field col-12 md:col-4" *ngIf="courrierSelectionne.sourceDestination =='ENTRANT'">
+            <span class="font-bold">Date courrier: </span>
+            {{courrierSelectionne.dateCourrier | date: 'dd/MM/yyyy'}}
+          </div>
+           <div class="field col-12 md:col-4" *ngIf="courrierSelectionne.sourceDestination =='ENTRANT'">
+            <span class="font-bold">Facteur: </span>
+            {{courrierSelectionne.expediteur}}
+          </div>
+          <div class="field col-12">
+            <span class="font-bold">Objet: </span>
+            {{courrierSelectionne.objet}}
+          </div>
+        </div>
+      </p-panel>
+    </div>
+
+    <!-- Suivi des imputations et affectations -->
+    <div class="col-12" *ngIf="courrierSelectionne.isImputer">
+      <p-panel header="Suivi des traitements" [toggleable]="true" [collapsed]="false">
+        <p-accordion [multiple]="true">
+          <!-- Timeline des tâches -->
+          <p-accordionTab header="Historique des tâches" [selected]="true">
+  <div *ngIf="suiviCourrier.taches && suiviCourrier.taches.length > 0; else noTaches">
+
+    <!-- Statistiques rapides -->
+    <div class="grid mb-4">
+      <div class="col-12 md:col-3">
+        <div class="surface-card shadow-2 p-3 border-round">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">Total Tâches</span>
+              <div class="text-900 font-medium text-xl">{{suiviCourrier.taches.length}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                 style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-list text-blue-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <div class="surface-card shadow-2 p-3 border-round">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">En cours</span>
+              <div class="text-900 font-medium text-xl">{{getTachesEnCours().length}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-orange-100 border-round"
+                 style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-clock text-orange-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <div class="surface-card shadow-2 p-3 border-round">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">Terminées</span>
+              <div class="text-900 font-medium text-xl">{{getTachesTerminees().length}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                 style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-check-circle text-green-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <div class="surface-card shadow-2 p-3 border-round">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">En retard</span>
+              <div class="text-900 font-medium text-xl">{{getTachesEnRetard().length}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-red-100 border-round"
+                 style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des tâches avec timeline -->
+    <p-timeline [value]="suiviCourrier.taches" layout="vertical" align="alternate">
+      <ng-template pTemplate="content" let-tache>
+        <p-card [styleClass]="getCardStyleClass(tache)">
+          <ng-template pTemplate="header">
+            <div class="flex justify-content-between align-items-center p-3"
+                 [style.background]="getHeaderBackground(tache)">
+              <div class="flex align-items-center gap-2">
+                <i [class]="getStatutIcon(tache.statut)" class="text-2xl"></i>
+                <span class="font-bold">Tâche #{{tache.id}}</span>
+              </div>
+              <div class="flex gap-2 align-items-center">
+                <!-- Badge de statut avec texte clair -->
+                <p-tag [severity]="getStatutBadge(tache.statut).severity"
+                       [value]="getStatutBadge(tache.statut).label"
+                       [icon]="getStatutIcon(tache.statut)">
+                </p-tag>
+                <p-tag [severity]="getPrioriteBadge(tache.priorite).severity"
+                       [value]="getPrioriteBadge(tache.priorite).label">
+                </p-tag>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="grid">
+            <!-- Statut détaillé -->
+            <div class="col-12" *ngIf="getStatutDetails(tache) as details">
+              <div class="p-3 border-round" [style.background]="details.background">
+                <div class="flex align-items-center gap-2 mb-2">
+                  <i [class]="details.icon" [style.color]="details.color" class="text-xl"></i>
+                  <span class="font-semibold" [style.color]="details.color">{{details.titre}}</span>
+                </div>
+                <p class="m-0 text-sm" [style.color]="details.color">{{details.message}}</p>
+              </div>
+            </div>
+
+            <!-- Dates importantes -->
+            <div class="col-12 md:col-6">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-calendar text-600"></i>
+                <span class="font-semibold">Date effet:</span>
+              </div>
+              <span>{{tache.dateEffet | date: 'dd/MM/yyyy'}}</span>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-calendar-times"
+                   [class.text-red-500]="isEcheanceDepassee(tache.dateEcheance)"
+                   [class.text-600]="!isEcheanceDepassee(tache.dateEcheance)"></i>
+                <span class="font-semibold">Date d'échéance:</span>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <span [class.text-red-500]="isEcheanceDepassee(tache.dateEcheance)">
+                  {{tache.dateEcheance | date: 'dd/MM/yyyy'}}
+                </span>
+                <p-tag *ngIf="isEcheanceDepassee(tache.dateEcheance) && tache.statut !== 'termine'"
+                       severity="danger"
+                       value="EN RETARD"
+                       icon="pi pi-exclamation-circle">
+                </p-tag>
+                <span *ngIf="!isEcheanceDepassee(tache.dateEcheance) && tache.statut !== 'termine'"
+                      class="text-sm text-green-600">
+                  ({{getJoursRestants(tache.dateEcheance)}} jours restants)
+                </span>
+              </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="col-12" *ngIf="tache.instructions && tache.instructions.length > 0">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-bookmark text-600"></i>
+                <span class="font-semibold">Instructions:</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <p-chip *ngFor="let instruction of tache.instructions"
+                        [label]="instruction.libelleInstruction"
+                        styleClass="custom-chip"
+                        icon="pi pi-tag">
+                </p-chip>
+              </div>
+            </div>
+
+            <!-- Observation -->
+            <div class="col-12" *ngIf="tache.observation">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-comment text-600"></i>
+                <span class="font-semibold">Observation:</span>
+              </div>
+              <p class="m-0 p-3 surface-100 border-round">{{tache.observation}}</p>
+            </div>
+
+            <!-- Agents affectés avec leur statut -->
+            <div class="col-12">
+              <div class="flex align-items-center gap-2 mb-3">
+                <i class="pi pi-users text-600"></i>
+                <span class="font-semibold">Agents affectés ({{tache.affectations?.length || 0}}):</span>
+              </div>
+              <p-table [value]="tache.affectations"
+                       styleClass="p-datatable-sm"
+                       responsiveLayout="scroll">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Matricule</th>
+                    <th>Agent</th>
+                    <th>Type</th>
+<!--                     <th>Progression</th>
+ -->                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-affectation>
+                  <tr [class.surface-100]="affectation.statut !== 'active'">
+                     <td>
+                      {{affectation.agentAssigneMatricule}}
+                    </td>
+                    <td>
+                      <div class="flex align-items-center gap-2">
+                        <div class="flex align-items-center justify-content-center border-circle"
+                             [style.background-color]="getAgentColor(affectation.agentAssigneId)"
+                             style="width: 35px; height: 35px; color: white; font-weight: bold;">
+                          {{getInitials(affectation.agentAssigneNom, affectation.agentAssignePrenom)}}
+                        </div>
+                        <span class="font-medium">
+                          {{affectation.agentAssigneNom}} {{affectation.agentAssignePrenom}}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td>
+                      <p-tag [severity]="affectation.reaffectation ? 'warning' : 'info'"
+                             [value]="affectation.reaffectation ? 'Réaffectation' : 'Affectation initiale'"
+                             [icon]="affectation.reaffectation ? 'pi pi-refresh' : 'pi pi-user-plus'">
+                      </p-tag>
+                    </td>
+                   <!--  <td>
+                      <div class="flex align-items-center gap-2">
+                        <i *ngIf="affectation.statut === 'terminee'"
+                           class="pi pi-check-circle text-green-500 text-xl"></i>
+                        <i *ngIf="affectation.statut === 'active' || affectation.statut === 'en_cours'"
+                           class="pi pi-spin pi-spinner text-orange-500"></i>
+                        <i *ngIf="affectation.statut === 'inactive'"
+                           class="pi pi-times-circle text-red-500"></i>
+                        <span class="text-sm">
+                          {{getProgressionLabel(affectation.statut)}}
+                        </span>
+                      </div>
+                    </td> -->
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="5" class="text-center text-500">Aucun agent affecté</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+
+              <!-- Motif de réaffectation si présent -->
+              <div *ngFor="let affectation of tache.affectations" class="mt-2">
+                <div *ngIf="affectation.reaffectation && affectation.motif"
+                     class="p-3 bg-orange-50 border-left-3 border-orange-500">
+                  <div class="flex align-items-start gap-2">
+                    <i class="pi pi-info-circle text-orange-500 mt-1"></i>
+                    <div>
+                      <span class="font-semibold text-orange-700">Motif de réaffectation:</span>
+                      <p class="m-0 mt-1 text-sm text-orange-600">{{affectation.motif}}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </ng-template>
+
+      <ng-template pTemplate="marker" let-tache>
+        <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
+              [style.background-color]="getMarkerColor(tache)">
+          <i [class]="getStatutIcon(tache.statut)"></i>
+        </span>
+      </ng-template>
+    </p-timeline>
+  </div>
+
+  <ng-template #noTaches>
+    <div class="text-center p-5 surface-100 border-round">
+      <i class="pi pi-info-circle text-4xl text-400 mb-3"></i>
+      <p class="text-600 m-0">Aucune tâche n'a encore été créée pour ce courrier</p>
+    </div>
+  </ng-template>
+</p-accordionTab>
+
+          <!-- Historique des actions -->
+          <!-- <p-accordionTab header="Historique des actions">
+            <p-timeline [value]="suiviCourrier.historiqueImputation" layout="vertical">
+              <ng-template pTemplate="content" let-historique>
+                <p-card>
+                  <div class="font-semibold mb-2">{{historique.action}}</div>
+                  <div class="text-sm text-600 mb-2">
+                    Par: {{historique.utilisateur}} - {{historique.date | date: 'dd/MM/yyyy HH:mm'}}
+                  </div>
+                  <div class="text-sm">{{historique.details}}</div>
+                </p-card>
+              </ng-template>
+
+              <ng-template pTemplate="marker" let-historique>
+                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
+                      style="background-color: #10b981">
+                  <i class="pi pi-history"></i>
+                </span>
+              </ng-template>
+            </p-timeline>
+
+            <div *ngIf="!suiviCourrier.historiqueImputation || suiviCourrier.historiqueImputation.length === 0"
+                 class="text-center p-5 surface-100 border-round">
+              <i class="pi pi-info-circle text-4xl text-400 mb-3"></i>
+              <p class="text-600 m-0">Aucun historique disponible</p>
+            </div>
+          </p-accordionTab> -->
+        </p-accordion>
+      </p-panel>
+    </div>
+
+    <!-- Fichiers joints -->
+    <div class="col-12">
+      <p-panel header="Pièces jointes" [toggleable]="true">
+        <div *ngIf="pieceJointes && pieceJointes.length > 0; else noFiles" class="files-container">
+          <div *ngFor="let pieceJointe of pieceJointes; trackBy: trackByFileId"
+            class="file-item p-3 border-round mb-2 surface-card hover:surface-hover cursor-pointer"
+            style="border: 1px solid var(--surface-border)">
+            <div class="flex align-items-center justify-content-between">
+              <div class="flex align-items-center flex-grow-1">
+                <i [class]="getFileIcon(pieceJointe.chemin || '')" class="text-3xl mr-3"
+                  [style.color]="getFileColor(pieceJointe.chemin || '')"></i>
+                <div class="flex-grow-1">
+                  <div class="font-medium text-900 mb-1">
+                    {{ pieceJointe.name || getFileName(pieceJointe.chemin ?? " ") }}
+                  </div>
+                  <div class="text-sm text-600">
+                    {{ formatFileSize(pieceJointe.tailleFichier ?? 0) }}
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <!-- <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-text"
+                          (onClick)="viewFile(pieceJointe)"
+                          pTooltip="Visualiser" tooltipPosition="top">
+                </p-button> -->
+                <p-button icon="pi pi-download" styleClass="p-button-rounded p-button-text"
+                          (onClick)="downloadFile(pieceJointe)"
+                          pTooltip="Télécharger" tooltipPosition="top">
+                </p-button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noFiles>
+          <div class="text-center p-4 border-2 border-dashed border-300 border-round">
+            <i class="pi pi-file text-4xl text-400 mb-3"></i>
+            <p class="text-600 m-0">Aucun fichier joint</p>
+          </div>
+        </ng-template>
+      </p-panel>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Fermer" icon="pi pi-times" class="p-button-secondary" (click)="cancelDetail()">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>
+
+<style>
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
+.badge-primary {
+    background-color: #3B82F6;
+    color: white;
+}
+
+.badge-info {
+    background-color: #06B6D4;
+    color: white;
+}
+
+.badge-success {
+    background-color: #10B981;
+    color: white;
+}
+
+.badge-warning {
+    background-color: #F59E0B;
+    color: white;
+}
+
+.text-overflow-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

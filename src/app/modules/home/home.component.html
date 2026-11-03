@@ -1,0 +1,48 @@
+<div class="layout-main-container">
+
+  <!-- Header -->
+  <div class="surface-card shadow-2 border-round p-4 mb-4"
+       style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600) 100%);">
+    <h1 class="text-white mb-2 font-bold text-4xl">
+      <i class="pi pi-home mr-2"></i>
+      Bienvenue
+    </h1>
+    <p class="text-white-alpha-80 m-0 text-lg">
+      <i class="pi pi-calendar mr-2"></i>
+      {{ currentDate }}
+    </p>
+  </div>
+
+  <!-- Modules -->
+  <div class="grid">
+    @for (m of modules; track m.title) {
+      <div class="col-12 md:col-6">
+        <div class="surface-card shadow-2 border-round p-4 h-full flex flex-column
+                    hover:shadow-4 transition-all transition-duration-300">
+          <div class="flex align-items-center gap-3 mb-3">
+            <div class="flex align-items-center justify-content-center border-round flex-shrink-0"
+                 [ngClass]="m.bg"
+                 style="width:3.5rem;height:3.5rem">
+              <i class="pi text-3xl" [ngClass]="[m.icon, m.color]"></i>
+            </div>
+            <h3 class="m-0 text-900">{{ m.title }}</h3>
+          </div>
+
+          <p class="text-600 line-height-3 mt-0 mb-4 flex-grow-1">{{ m.description }}</p>
+
+          <div class="flex flex-wrap gap-2">
+            @for (a of m.actions; track a.route) {
+              <p-button [label]="a.label"
+                        [icon]="a.icon"
+                        [routerLink]="a.route"
+                        [outlined]="true"
+                        [rounded]="true">
+              </p-button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

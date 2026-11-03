@@ -1,0 +1,314 @@
+<div class="grid dashboard">
+    <div class="col-12 md:col-8">
+        <div class="card h-full">
+            <div class="p-2 h-full flex flex-column justify-content-between">
+                <div class="flex aling-items-center justify-content-between mb-3">
+                    <div
+                        class="flex gap-3 flex-column justify-content-between w-full md:flex-row md:align-items-center">
+                        <div class="flex gap-3 align-items-center">
+                            <div class="text-4xl">👋</div>
+                            <div class="flex flex-column gap-1 text-600">
+                                <span class="text-2xl font-semibold">Hi,<span class="text-color"> Amy!</span></span>
+                                <span>Team Lead <span class="font-bold text-primary">&#64;UX Designer</span></span>
+                            </div>
+                        </div>
+                        <div class="flex align-items-center gap-2">
+                            <button pButton pRipple type="button" label="Primary" icon="pi pi-send"
+                                class="p-button-outlined" label="Enroll a Ticket"></button>
+                            <button pButton pRipple type="button" label="Primary" icon="pi pi-chart-line"
+                                label="Upgrade Your Plan"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-column gap-2 text-primary mt-4 md:mt-0">
+                    <span class="font-bold text-sm">Done in Current Month</span>
+                    <div class="grid grid-nogutter font-medium">
+                        <span class="col-6 text-6xl md:col-3 flex align-items-center">72 <span
+                                class="text-base ml-2">tasks</span></span>
+                        <span class="col-6 text-6xl md:col-3 flex align-items-center">4 <span
+                                class="text-base ml-2">production</span></span>
+                        <span class="col-6 text-6xl md:col-3 flex align-items-center">18 <span
+                                class="text-base ml-2">tests</span></span>
+                        <span class="col-6 text-6xl md:col-3 flex align-items-center">13 <span
+                                class="text-base ml-2">meetings</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 md:col-4">
+        <div
+            class="h-full bg-primary flex justify-content-between align-items-center pl-5 py-3 border-round-md overflow-hidden">
+            <div class="flex flex-column justify-content-center">
+                <div><span class="font-bold text-white text-sm">Carry your team on top</span></div>
+                <div>
+                    <h5 class="font-bold text-white mt-1 text-4xl m-0">Upgrade Now</h5>
+                </div>
+                <div><button pButton pRipple type="button" icon="pi pi-database" label="See All Plans"
+                        class="p-button-outlined bg-white mt-3"></button></div>
+            </div>
+            <div><img class="-mr-3" [draggable]="false" src="assets/layout/images/dashboard/saas-card.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card flex justify-content-between align-items-center">
+            <div class="p-2 h-full w-full flex flex-column justify-content-between">
+                <div class="flex align-items-center justify-content-between mb-3">
+                    <span class="font-semibold text-lg text-900">My Workspace</span>
+                </div>
+                <div class="grid">
+                    <div class="col-12 md:col-4">
+                        <div class="flex flex-column gap-3 border-round-md border-1 h-full surface-border py-4">
+                            <div class="flex justify-content-between align-items-center mx-4">
+                                <div class="flex align-items-center gap-3">
+                                    <div>
+                                        <p-knob [showValue]="false" [size]="36" rangeColor="#EEEEEE" [readonly]="true"
+                                            [max]="5" [(ngModel)]="completeTask"></p-knob>
+                                    </div>
+                                    <div class="flex flex-column justify-content-between gap-1">
+                                        <span class="font-bold text-900">My Daily Tasks</span>
+                                        <span class="text-color-secondary text-sm"><span
+                                                class="font-bold">{{completeTask}}</span>/5 Tasks</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-outlined"
+                                        label="New Task"></button>
+                                </div>
+                            </div>
+                            <div class="flex flex-column gap-2 h-21rem overflow-auto -mb-4">
+                                <div *ngFor="let task of dailyTasks"
+                                    class="flex justify-content-between p-3 surface-50 cursor-pointer text-color-secondary border-round-md mx-4 hover:surface-card hover:shadow-2">
+                                    <div class="flex gap-3">
+                                        <div>
+                                            <p-checkbox (onChange)="changeChecked()" [(ngModel)]="task.checked"
+                                                [binary]="true"></p-checkbox>
+                                        </div>
+                                        <div class="flex flex-column gap-2">
+                                            <span class="font-medium text-sm">{{task.label}}</span>
+                                            <div class="flex gap-2 align-items-center">
+                                                <i class="pi pi-align-left text-color-secondary "></i>
+                                                <i class="pi pi-file text-color-secondary"></i>
+                                                <i class="pi pi-image text-color-secondary"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <div class="flex align-items-end">
+                                            <p-avatarGroup>
+                                                <p-avatar [image]="task.avatar" shape="circle"></p-avatar>
+                                                <p-avatar label="+2" shape="circle"
+                                                    styleClass="surface-200 text-color-secondary"></p-avatar>
+                                            </p-avatarGroup>
+                                        </div>
+                                        <div class="flex align-items-center">
+                                            <i class="pi pi-ellipsis-h text-color-secondary"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <div class="flex flex-column gap-3 border-round-md border-1 h-full surface-border p-4">
+                            <div class="flex justify-content-between align-items-center">
+                                <div class="flex align-items-center gap-3">
+                                    <div>
+                                        <i class="pi pi-chart-bar text-primary text-3xl"></i>
+                                    </div>
+                                    <div class="flex flex-column justify-content-between gap-1">
+                                        <span class="font-bold text-900">My Performance</span>
+                                    </div>
+                                </div>
+                                <div class="flex align-items-center gap-1">
+                                    <div
+                                        class="flex align-items-center justify-content-center gap-1 border-round-md p-2 bg-red-100 text-red-400">
+                                        <i class="pi pi-arrow-down-right"></i>
+                                        <span>-13%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-column gap-2 h-21rem overflow-auto -mb-4 relative">
+                                <p-chart height="294" type="line" [data]="basicData" [options]="basicOptions"></p-chart>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <div class="flex flex-column gap-3 border-round-md border-1 h-full surface-border py-4">
+                            <div class="flex justify-content-between align-items-center mx-4">
+                                <div class="flex align-items-center gap-3">
+                                    <div>
+                                        <i class="pi pi-calendar text-primary text-3xl"></i>
+                                    </div>
+                                    <div class="flex flex-column justify-content-between gap-1">
+                                        <span class="font-bold text-900">My Calendar</span>
+                                        <span class="text-color-secondary text-sm"><span class="font-bold">19</span>
+                                            Events on this month</span>
+                                    </div>
+                                </div>
+                                <div class="flex align-items-center gap-1">
+                                    <button pButton pRipple type="button" icon="pi pi-filter"
+                                        class="p-button-outlined"></button>
+                                    <button pButton pRipple type="button" icon="pi pi-plus"
+                                        class="p-button-outlined"></button>
+                                </div>
+                            </div>
+                            <div class="flex flex-column gap-2 h-21rem overflow-auto -mb-4">
+                                <div *ngFor="let task of dailyTasks"
+                                    class="flex justify-content-between px-3 py-2 border-left-2 cursor-pointer mx-4 border-round-md surface-50 hover:shadow-2 hover:surface-card"
+                                    [class]="task.borderColor">
+                                    <div class="flex justify-content-between gap-3">
+                                        <div class="flex flex-column justify-content-center gap-2 ">
+                                            <span class="font-medium text-base text-color">{{task.label}}</span>
+                                            <span class="text-color-secondary text-sm">{{task.description}}</span>
+                                            <span
+                                                class="flex align-items-center font-medium gap-1 text-color-secondary text-xs"><i
+                                                    class="pi pi-clock"></i> 10:30 AM</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-ellipsis-h text-color-secondary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card flex justify-content-between align-items-center">
+            <div class="p-2 h-full w-full flex flex-column justify-content-between">
+                <div class="flex align-items-center justify-content-between mb-3">
+                    <span class="font-semibold text-lg text-900">Projects Overview</span>
+                    <div class="flex align-items-center gap-2 ">
+                        <button pButton pRipple label="Organize Teams" icon="pi pi-sliders-h"
+                            class="p-button-outlined"></button>
+                        <button pButton pRipple label="New Project" icon="pi pi-plus-circle"></button>
+                    </div>
+                </div>
+                <div class="grid">
+                    <ng-container *ngFor="let project of projectList; let i = index">
+                        <div (click)="selectedProjectID=project.id" *ngIf="i<2" [ngClass]="{'hidden md:block':i<1}"
+                            class="col-12 md:col-4">
+                            <div class="flex flex-column border-1 surface-border justify-content-between p-3 gap-3 cursor-pointer border-round-md"
+                                [ngClass]="{'bg-primary border-0':selectedProjectID === project.id}">
+                                <div class="flex justify-content-between align-items-center">
+                                    <div class="flex gap-2 font-bold text-sm align-items-center">
+                                        <i class="pi pi-star-fill"
+                                            [ngClass]="{'text-primary':selectedProjectID !== project.id}"></i>
+                                        <span>{{project.title}}</span>
+                                    </div>
+                                    <div class="flex gap-2 text-sm align-items-center text-xs font-bold">
+                                        <div class="surface-200 p-1 px-2 flex font-medium gap-2 border-round-md"
+                                            [ngClass]="{'bg-primary-600':selectedProjectID === project.id}">
+                                            <span
+                                                [ngClass]="{'text-color-secondary':selectedProjectID !== project.id}">25
+                                                July</span><i class="pi pi-arrow-right"
+                                                [ngClass]="{'text-color-secondary':selectedProjectID !== project.id}"></i>
+                                            <span
+                                                [ngClass]="{'text-color-secondary':selectedProjectID !== project.id}">25
+                                                Aug</span>
+                                        </div>
+                                        <i class="pi pi-ellipsis-h"
+                                            [ngClass]="{'text-color-secondary':selectedProjectID !== project.id}"></i>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 align-items-center">
+                                    <span class="text-sm"
+                                        [ngClass]="{'text-color-secondary':selectedProjectID !== project.id}"><span
+                                            class="font-bold">{{project.completedTask}}</span>/{{project.totalTasks}}
+                                        Tasks</span>
+                                    <div class="surface-200 w-full border-round-lg"
+                                        [ngClass]="{'bg-primary-700': selectedProjectID === project.id}">
+                                        <div style="height: 6px;" class="surface-0 w-5 border-round-left-lg"
+                                            [ngClass]="{'bg-primary-700': selectedProjectID !== project.id}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div class="col-12 md:col-4">
+                        <div
+                            class="flex justify-content-between align-items-center p-3 cursor-pointer border-1 surface-border border-round-md h-full">
+                            <div class="flex flex-column gap-2">
+                                <span>Other Projects</span>
+                                <p-tag value="+5 Projects"></p-tag>
+                            </div>
+                            <i class="pi pi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <div class="border-1 surface-border p-3 border-round-md flex flex-column gap-3">
+                            <div class="flex justify-content-between align-items-center">
+                                <div class="flex flex-column gap-1">
+                                    <span class="font-semibold text-900 text-lg">Teams</span>
+                                    <span class="text-sm text-color-secondary">18 Members</span>
+                                </div>
+                                <button pButton pRipple label="New Team" icon="pi pi-users"></button>
+                            </div>
+                            <div class="flex flex-column gap-1">
+                                <div (click)="teamFilter(team.title)" *ngFor="let team of teams" class="flex justify-content-between align-items-center border-1 border-transparent border-round-md p-3 -mx-2 cursor-pointer hover:surface-hover" [ngClass]="{'bg-primary-50 border-primary-100':selectedTeam === team.title }">
+                                    <div class="flex align-items-center gap-3">
+                                        <div style="width:7px;height:7px;" class="border-circle" [class]="team.badgeClass"></div>
+                                        <span>{{team.title}}</span>
+                                    </div>
+                                    <div class="flex gap-2 align-items-center">
+                                        <p-avatarGroup>
+                                            <p-avatar *ngFor="let avatar of team.avatar" [image]="avatar" shape="circle"></p-avatar>
+                                            <p-avatar *ngIf="team.avatarText" [label]="team.avatarText" shape="circle" styleClass="surface-200 text-color-secondary" [style]="{'color': '#ffffff'}"></p-avatar>
+                                        </p-avatarGroup>
+                                        <i *ngIf="selectedTeam === team.title" class="pi pi-chevron-right text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-8">
+                        <div class="border-1 surface-border border-round-md h-28rem overflow-y-auto">
+                            <div *ngFor="let member of filteredTeamMembers" class="grid grid-nogutter align-items-center p-2 border-bottom-1 surface-border text-700 cursor-pointer hover:text-color">
+                                <div class="col-4">
+                                    <div class="flex align-items-center gap-3">
+                                        <p-avatar size="large" shape="circle" [image]="member.avatar"></p-avatar>
+                                        <div class="flex flex-column flex-wrap">
+                                            <span class="font-medium">{{member.name}}</span>
+                                            <span class="text-sm">{{member.title}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="flex justify-content-between gap-5 flex-1">
+                                        <div class="flex flex-column" style="flex-basis: 100%;">
+                                            <span class="font-medium">{{member.taskCount}}</span>
+                                            <span class="text-sm">Task</span>
+                                        </div>
+                                        <div class="flex flex-column" style="flex-basis: 100%;">
+                                            <span class="font-medium">{{member.doneCount}}</span>
+                                            <span class="text-sm">Done</span>
+                                        </div>
+                                        <div class="flex flex-column" style="flex-basis: 100%;">
+                                            <span class="font-medium">{{member.sprintCount}}</span>
+                                            <span class="text-sm">Sprint</span>
+                                        </div>
+                                        <div class="flex flex-column" style="flex-basis: 100%;">
+                                            <span class="font-medium">{{member.onProjectsCount}}</span>
+                                            <span class="text-sm">On Projects</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="flex justify-content-end">
+                                        <button pButton pRipple icon="pi pi-ellipsis-h" class="p-button-text p-button-rounded text-900"></button>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

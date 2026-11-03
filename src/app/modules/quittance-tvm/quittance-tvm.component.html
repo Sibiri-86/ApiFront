@@ -1,0 +1,92 @@
+<div class="card p-4">
+  <h2 class="mt-0">Transactions TVM</h2>
+
+  <!-- Filtres -->
+  <div class="flex flex-wrap align-items-end gap-3 mb-4">
+    <div class="flex flex-column gap-2">
+      <label for="debut">Date début</label>
+      <p-calendar id="debut" [(ngModel)]="dateDebut" dateFormat="dd/mm/yy"
+                  [showIcon]="true" [maxDate]="dateFin"></p-calendar>
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <label for="fin">Date fin</label>
+      <p-calendar id="fin" [(ngModel)]="dateFin" dateFormat="dd/mm/yy"
+                  [showIcon]="true" [minDate]="dateDebut"></p-calendar>
+    </div>
+
+    <p-button label="Rechercher" icon="pi pi-search"
+              [loading]="loading()" (onClick)="rechercher()"></p-button>
+  </div>
+
+  @if (error()) {
+    <p-message severity="error" [text]="error()!" styleClass="mb-3"></p-message>
+  }
+
+  <!-- Tableau -->
+  <p-table #dt
+           [value]="quittances()"
+           [loading]="loading()"
+           [paginator]="true" [rows]="20" [rowsPerPageOptions]="[10, 20, 50, 100]"
+           [globalFilterFields]="globalFields"
+           [rowHover]="true" [scrollable]="true"
+           dataKey="numQuittance"
+           styleClass="p-datatable-sm p-datatable-striped"
+           currentPageReportTemplate="{first} - {last} sur {totalRecords}"
+           [showCurrentPageReport]="true">
+
+    <ng-template pTemplate="caption">
+      <div class="flex justify-content-between align-items-center">
+        <p-button label="Exporter CSV" icon="pi pi-download" severity="secondary"
+                  [disabled]="!quittances().length" (onClick)="dt.exportCSV()"></p-button>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" placeholder="Rechercher dans le tableau"
+                 (input)="filtrer(dt, $event)" />
+        </span>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">#</th>
+        <th pSortableColumn="numQuittance">N° quittance <p-sortIcon field="numQuittance"></p-sortIcon></th>
+        <th pSortableColumn="datePayement">Date paiement <p-sortIcon field="datePayement"></p-sortIcon></th>
+        <th pSortableColumn="noImmat">Immatriculation <p-sortIcon field="noImmat"></p-sortIcon></th>
+        <th pSortableColumn="identite">Identité <p-sortIcon field="identite"></p-sortIcon></th>
+        <th pSortableColumn="numContribuable">N° contribuable <p-sortIcon field="numContribuable"></p-sortIcon></th>
+        <th pSortableColumn="idTransaction">ID transaction <p-sortIcon field="idTransaction"></p-sortIcon></th>
+        <th pSortableColumn="montantPaye" class="text-right">Montant payé <p-sortIcon field="montantPaye"></p-sortIcon></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-q let-i="rowIndex">
+      <tr>
+        <td>{{ i + 1 }}</td>
+        <td>{{ q.numQuittance }}</td>
+        <td>{{ q.datePayement | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ q.noImmat }}</td>
+        <td>{{ q.identite }}</td>
+        <td>{{ q.numContribuable }}</td>
+        <td>{{ q.idTransaction }}</td>
+        <td class="text-right">{{ q.montantPaye | number: '1.0-0' : 'fr' }} </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="7" class="text-right font-bold">Total ({{ nombre() }} transactions)</td>
+        <td class="text-right font-bold">{{ total() | number: '1.0-0' : 'fr' }} </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center p-4">
+          {{ loaded() ? 'Aucune transaction trouvée pour cette période.'
+                      : 'Choisissez une période puis cliquez sur Rechercher.' }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

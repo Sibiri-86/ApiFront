@@ -1,0 +1,42 @@
+<div class="layout-menu-profile">
+    <button class="p-link" (click)="toggleMenu()" pTooltip="Profile" [tooltipDisabled]="isTooltipDisabled">
+        <img src="assets/demo/images/avatar/photo.jpg" alt="avatar" style="width: 32px; height: 32px;">
+        <span>
+            <span class="user-info">
+  <strong>{{ user?.firstName }} {{ user?.lastName }}</strong><br>
+  <small>{{ user?.profil?.libelle }}</small>
+</span>
+
+
+<span *ngIf="!user">
+    <strong>Chargement...</strong>
+    <small>Profil</small>
+</span>
+
+
+
+        </span>
+        <i class="layout-menu-profile-toggler pi pi-fw" [ngClass]="{'pi-angle-down': menuProfilePosition === 'start' || isHorizontal, 'pi-angle-up': menuProfilePosition === 'end' && !isHorizontal}"></i>
+    </button>
+
+    <ul *ngIf="menuProfileActive" [@menu]="isHorizontal ? 'overlay' : 'inline'" class="p-0 m-0">
+  <li pTooltip="Mon Profil" [tooltipDisabled]="isTooltipDisabled">
+    <a class="cursor-pointer flex align-items-center justify-content-start gap-2 px-3 py-2 hover:surface-hover transition-all transition-duration-150"
+       pRipple
+       [routerLink]="['/agent/profile']">
+      <i class="pi pi-user text-primary"></i>
+      <span class="font-medium text-900">Mon Profil</span>
+    </a>
+  </li>
+
+  <li pTooltip="Déconnexion" [tooltipDisabled]="isTooltipDisabled">
+    <a class="cursor-pointer flex align-items-center justify-content-start gap-2 px-3 py-2 hover:surface-hover transition-all transition-duration-150"
+       pRipple
+       (click)="logout()">
+      <i class="pi pi-power-off text-danger"></i>
+      <span class="font-medium text-900">Logout</span>
+    </a>
+  </li>
+</ul>
+
+</div>
