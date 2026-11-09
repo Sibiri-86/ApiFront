@@ -70,6 +70,7 @@ export class HomeComponent {
       bg: 'bg-purple-100',
       actions: [
         { label: 'Utilisateurs', icon: 'pi pi-users', route: '/admin/user' },
+        { label: 'Opérateurs', icon: 'pi pi-id-card', route: '/admin/operateurs' },
         { label: 'Modules', icon: 'pi pi-th-large', route: '/admin/module-param' }
       ]
     }

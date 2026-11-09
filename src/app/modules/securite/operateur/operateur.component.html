@@ -1,0 +1,357 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <h3 class="m-0">Gestion des opérateurs</h3>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <button pButton pRipple label="Nouvel opérateur" icon="pi pi-plus" class="p-button-success" (click)="openNew()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table [value]="operateurs" [paginator]="true" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Code</th>
+        <th>Libellé</th>
+        <th>API</th>
+        <th>Secrets</th>
+        <th style="width: 12rem">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-operateur>
+      <tr>
+        <td>{{ operateur.codeOperateur }}</td>
+        <td>{{ operateur.libelleOperateur }}</td>
+        <td>{{ getSelectedApiList(operateur) }}</td>
+        <td>
+          <span class="text-sm text-600" *ngIf="!operateur.apiTvm && !operateur.apiTr && !operateur.apiImpot && !operateur.apiIfu && !operateur.apiOds">-</span>
+          <div class="flex flex-wrap gap-1" *ngIf="operateur.apiTvm || operateur.apiTr || operateur.apiImpot || operateur.apiIfu || operateur.apiOds">
+            <span *ngIf="operateur.apiTvm" class="api-badge">TVM</span>
+            <span *ngIf="operateur.apiTr" class="api-badge">TR</span>
+            <span *ngIf="operateur.apiImpot" class="api-badge">Impôt</span>
+            <span *ngIf="operateur.apiIfu" class="api-badge">IFU</span>
+            <span *ngIf="operateur.apiOds" class="api-badge">ODS</span>
+          </div>
+        </td>
+        <td>
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text" (click)="editOperateur(operateur)"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="deleteOperateur(operateur)"></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center">Aucun opérateur enregistré.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- <p-dialog [(visible)]="operateurDialog" [style]="{ width: '750px' }" header="Détail de l'opérateur" [modal]="true" class="p-fluid" [dismissableMask]="true">
+  <ng-template pTemplate="content">
+    <div class="grid formgrid p-fluid">
+      <div class="field col-12 md:col-6">
+        <label for="codeOperateur">Code</label>
+        <input id="codeOperateur" type="text" pInputText [(ngModel)]="operateur.codeOperateur" required />
+      </div>
+
+      <div class="field col-12 md:col-6">
+        <label for="libelleOperateur">Libellé</label>
+        <input id="libelleOperateur" type="text" pInputText [(ngModel)]="operateur.libelleOperateur" required />
+      </div>
+
+      <div class="field col-12">
+        <label>Accès API</label>
+        <div class="flex flex-wrap gap-3 mt-2">
+          <div *ngFor="let api of apiOptions" class="flex align-items-center gap-2">
+            <p-checkbox
+              [binary]="true"
+              [name]="api.key"
+              [ngModel]="getApiValue(api.key)"
+              (ngModelChange)="setApiValue(api.key, $event)"
+              inputId="{{ api.key }}">
+            </p-checkbox>
+            <label [for]="api.key">{{ api.label }}</label>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngIf="operateur.apiTvm">
+        <div class="field col-12 md:col-6">
+          <label for="secretTvm">Secret TVM</label>
+          <input id="secretTvm" type="text" pInputText [(ngModel)]="operateur.secretTvm" />
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="operateur.apiTr">
+        <div class="field col-12 md:col-6">
+          <label for="secretTr">Secret TR</label>
+          <input id="secretTr" type="text" pInputText [(ngModel)]="operateur.secretTr" />
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="operateur.apiImpot">
+        <div class="field col-12 md:col-6">
+          <label for="secretImpot">Secret Impôt</label>
+          <input id="secretImpot" type="text" pInputText [(ngModel)]="operateur.secretImpot" />
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="operateur.apiIfu">
+        <div class="field col-12 md:col-6">
+          <label for="secretIfu">Secret IFU</label>
+          <input id="secretIfu" type="text" pInputText [(ngModel)]="operateur.secretIfu" />
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="operateur.apiOds">
+        <div class="field col-12 md:col-6">
+          <label for="secretOds">Secret ODS</label>
+          <input id="secretOds" type="text" pInputText [(ngModel)]="operateur.secretOds" />
+        </div>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Annuler" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+    <button pButton pRipple label="Enregistrer" icon="pi pi-check" class="p-button-success" (click)="saveOperateur()"></button>
+  </ng-template>
+</p-dialog>
+ -->
+<p-dialog
+  [(visible)]="operateurDialog"
+  [style]="{ width: '760px' }"
+  [breakpoints]="{ '960px': '90vw' }"
+  [modal]="true"
+  [draggable]="false"
+  [dismissableMask]="true"
+  styleClass="operateur-dialog p-fluid">
+
+  <!-- En-tête personnalisé -->
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-3">
+      <span class="dialog-icon"><i class="pi pi-building"></i></span>
+      <div class="flex flex-column">
+        <span class="text-xl font-semibold">Détail de l'opérateur</span>
+        <small class="text-color-secondary">Renseignez les informations et les accès API</small>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="content">
+    <!-- Section 1 : Informations générales -->
+    <section class="dialog-section">
+      <h4 class="section-title"><i class="pi pi-id-card"></i> Informations générales</h4>
+
+      <div class="grid formgrid">
+        <div class="field col-12 md:col-5">
+          <label for="codeOperateur">Code <span class="required">*</span></label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-hashtag"></i>
+            <input id="codeOperateur" type="text" pInputText placeholder="Ex : OP001"
+                   [(ngModel)]="operateur.codeOperateur" required />
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-7">
+          <label for="libelleOperateur">Libellé <span class="required">*</span></label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-tag"></i>
+            <input id="libelleOperateur" type="text" pInputText placeholder="Nom de l'opérateur"
+                   [(ngModel)]="operateur.libelleOperateur" required />
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2 : Accès API -->
+    <section class="dialog-section">
+      <h4 class="section-title"><i class="pi pi-key"></i> Accès API</h4>
+
+      <div class="grid">
+        <div class="col-12 sm:col-6 md:col-4" *ngFor="let api of apiOptions">
+          <div class="api-card"
+               [class.active]="getApiValue(api.key)"
+               (click)="setApiValue(api.key, !getApiValue(api.key))">
+            <span class="api-label">{{ api.label }}</span>
+            <p-inputSwitch
+              [ngModel]="getApiValue(api.key)"
+              (ngModelChange)="setApiValue(api.key, $event)"
+              (click)="$event.stopPropagation()"
+              [inputId]="api.key">
+            </p-inputSwitch>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3 : Secrets (visible seulement si une API est activée) -->
+    <section class="dialog-section secrets-section"
+             *ngIf="operateur.apiTvm || operateur.apiTr || operateur.apiImpot || operateur.apiIfu || operateur.apiOds">
+      <h4 class="section-title"><i class="pi pi-lock"></i> Secrets</h4>
+
+      <div class="grid formgrid">
+        <div class="field col-12 md:col-6" *ngIf="operateur.apiTvm">
+          <label for="secretTvm">Secret TVM</label>
+          <p-password inputId="secretTvm" [(ngModel)]="operateur.secretTvm"
+                      [feedback]="false" [toggleMask]="true" placeholder="Saisir le secret"
+                      styleClass="w-full" inputStyleClass="w-full"></p-password>
+        </div>
+
+        <div class="field col-12 md:col-6" *ngIf="operateur.apiTr">
+          <label for="secretTr">Secret TR</label>
+          <p-password inputId="secretTr" [(ngModel)]="operateur.secretTr"
+                      [feedback]="false" [toggleMask]="true" placeholder="Saisir le secret"
+                      styleClass="w-full" inputStyleClass="w-full"></p-password>
+        </div>
+
+        <div class="field col-12 md:col-6" *ngIf="operateur.apiImpot">
+          <label for="secretImpot">Secret Impôt</label>
+          <p-password inputId="secretImpot" [(ngModel)]="operateur.secretImpot"
+                      [feedback]="false" [toggleMask]="true" placeholder="Saisir le secret"
+                      styleClass="w-full" inputStyleClass="w-full"></p-password>
+        </div>
+
+        <div class="field col-12 md:col-6" *ngIf="operateur.apiIfu">
+          <label for="secretIfu">Secret IFU</label>
+          <p-password inputId="secretIfu" [(ngModel)]="operateur.secretIfu"
+                      [feedback]="false" [toggleMask]="true" placeholder="Saisir le secret"
+                      styleClass="w-full" inputStyleClass="w-full"></p-password>
+        </div>
+
+        <div class="field col-12 md:col-6" *ngIf="operateur.apiOds">
+          <label for="secretOds">Secret ODS</label>
+          <p-password inputId="secretOds" [(ngModel)]="operateur.secretOds"
+                      [feedback]="false" [toggleMask]="true" placeholder="Saisir le secret"
+                      styleClass="w-full" inputStyleClass="w-full"></p-password>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple type="button" label="Annuler" icon="pi pi-times"
+            class="p-button-text p-button-secondary" (click)="hideDialog()"></button>
+    <button pButton pRipple type="button" label="Enregistrer" icon="pi pi-check"
+            class="p-button-success"
+            [disabled]="!operateur.codeOperateur || !operateur.libelleOperateur"
+            (click)="saveOperateur()"></button>
+  </ng-template>
+</p-dialog>
+
+<style>
+  ::ng-deep .operateur-dialog .p-dialog-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  ::ng-deep .operateur-dialog .p-dialog-content {
+    padding: 1.25rem 1.5rem;
+    background: var(--surface-ground);
+  }
+
+  ::ng-deep .operateur-dialog .p-dialog-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--surface-border);
+  }
+
+  .dialog-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 12px;
+    background: var(--primary-color);
+    color: var(--primary-color-text);
+    font-size: 1.25rem;
+  }
+
+  .dialog-section {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .dialog-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .section-title i {
+    color: var(--primary-color);
+  }
+
+  .field {
+    margin-bottom: 0.5rem;
+  }
+
+  .field label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+
+  .required {
+    color: var(--red-500);
+  }
+
+  /* Cartes cliquables pour les accès API */
+  .api-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 10px;
+    background: var(--surface-card);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .api-card:hover {
+    border-color: var(--primary-color);
+  }
+
+  .api-card.active {
+    border-color: var(--primary-color);
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--surface-card));
+  }
+
+  .api-label {
+    font-weight: 500;
+  }
+
+  /* Apparition douce de la section des secrets */
+  .secrets-section {
+    animation: fadeSlide 0.25s ease;
+  }
+
+  @keyframes fadeSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

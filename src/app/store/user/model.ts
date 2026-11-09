@@ -14,6 +14,12 @@ export interface User {
        lastModifiedBy?: string;
        lastModifiedDate?: Date;
        password?: string;
-       profil?:Profil;
+       profil?: Profil;
+       operateurId?: number;
+       operateur?: {
+              id?: number;
+              codeOperateur?: string;
+              libelleOperateur?: string;
+       };
 }
 

@@ -11,6 +11,11 @@ export class Endpoints {
         mock: `assets/mock/user.mock.json`
     };
 
+    static readonly OPERATEUR = {
+        prod: `${SERVICE_PREFIX}/operateurs`,
+        mock: `assets/mock/operateur.mock.json`
+    };
+
     static readonly MODULE = {
         prod: `${SERVICE_PREFIX}/moduleParams`,
         mock: `assets/mock/moduleParam.mock.json`

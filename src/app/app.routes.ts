@@ -70,6 +70,11 @@ export const routes: Routes = [
                 //  canActivate: [UserRouteAccessService]
             },
             {
+                path: 'operateurs',
+                data: { breadcrumb: 'Opérateurs' },
+                loadComponent: () => import('./modules/securite/operateur/operateur.component').then(m => m.OperateurComponent),
+            },
+            {
                 path: 'tvm-verification',
                 loadComponent: () =>
                     import('./modules/tvm/tvm-verification.component').then((m) => m.TvmVerificationComponent),

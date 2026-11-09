@@ -29,16 +29,20 @@
                     <th style="font-weight: bold;">Profil
                         <p-columnFilter type="text" display="menu" field="profil.libelle"></p-columnFilter>
 
-                    </th>
+                    <!-- </th>
                     <th style="font-weight: bold;">Matricule
                         <p-columnFilter type="text" display="menu" field="login"></p-columnFilter>
-                    </th>
+                    </th> -->
 
                     <th style="font-weight: bold;">Nom
                         <p-columnFilter type="text" display="menu" field="lastName"></p-columnFilter>
                     </th>
                     <th style="font-weight: bold;">Prénom(s)
                         <p-columnFilter type="text" display="menu" field="firstName"></p-columnFilter>
+                    </th>
+
+                    <th style="font-weight: bold;">Opérateur
+                        <p-columnFilter type="text" display="menu" field="operateur.libelleOperateur"></p-columnFilter>
                     </th>
                     <th style="font-weight: bold;">Status
                     </th>
@@ -53,9 +57,10 @@
 
 
                     <td class="table-separator ">{{user.profil?.libelle}}</td>
-                    <td class="table-separator">{{user.login }}</td>
+                    <!-- <td class="table-separator">{{user.login }}</td> -->
                     <td class="table-separator"> {{user.lastName}}</td>
                     <td class="table-separator"> {{user.firstName}}</td>
+                    <td class="table-separator"> {{user.operateur?.libelleOperateur}}</td>
                     <td class="table-separator"
                         [ngClass]="{'activated': user.activated, 'not-activated': !user.activated}">
                         {{ user.activated ? 'ACTIF' : 'INACTIF' }}
@@ -69,6 +74,7 @@
                             (click)="selectedItem = user" [model]="itemsNoActif" text styleClass="p-button-primary"
                             severity="danger"></p-splitButton>
                     </td>
+
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage" let-columns>
@@ -98,7 +104,16 @@
 
                     </p-dropdown>
                 </div>
-               
+
+
+                <div class="col-6">
+                    <label class="w-full">Opérateur</label>
+                    <p-dropdown [options]="operateurs" name="operateur" [(ngModel)]="user.operateurId"
+                        [showClear]="true" [filter]="true" [style]="{width:'100%'}" filterBy="libelleOperateur"
+                        placeholder="Selectionnez un opérateur" optionLabel="libelleOperateur" optionValue="id"
+                        appendTo="body" class="multiselect-custom" display="chip">
+                    </p-dropdown>
+                </div>
 
                 <div class="col-6">
                     <label class="w-full">Nom <span style="color: red !important; size: 1.4em;"
@@ -201,7 +216,8 @@
             </div>
             <div class="field col-12 md:col-3"><span class="font-bold">Login: </span>{{detailUser.login}}
             </div>
-
+            <div class="field col-12 md:col-3"><span class="font-bold">Opérateur: </span> {{detailUser.operateur?.libelleOperateur}}
+            </div>
 
             <div class="field col-12 md:col-3"><span class="font-bold">Statut: </span><span
                     [ngClass]="{'activated': detailUser.activated, 'not-activated': !detailUser.activated}">{{

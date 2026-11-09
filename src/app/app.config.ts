@@ -17,6 +17,8 @@ import { MenuActionEffects } from './store/menu/effect';
 import { Menureducer } from './store/menu/reducer';
 import { ModuleParamEffects } from './store/module-param/effect';
 import { Modulereducer } from './store/module-param/reducer';
+import { OperateurEffects } from './store/operateur/effect';
+import { OperateurReducer } from './store/operateur/reducer';
 import { GlobalConfigreducer } from './store/global-config/reducer';
 
 import { dashboardReducer } from './store/dashboard/reducer';
@@ -59,6 +61,7 @@ export const appConfig: ApplicationConfig = {
       globalState: GlobalConfigreducer,
       profilState: reducer,
       userState: UserReducer,
+      operateurState: OperateurReducer,
       menuActionState: Menureducer,
       moduleParamState: Modulereducer,
       dashboard: dashboardReducer,
@@ -74,6 +77,7 @@ export const appConfig: ApplicationConfig = {
       UserEffects,
       MenuActionEffects,
       ModuleParamEffects,
+      OperateurEffects,
       DashboardEffects,
       TvmEffects,
       QuittanceTvmEffects,

@@ -59,6 +59,11 @@ export class AppMenuComponent implements OnInit {
                 // roles: ['UTILISATEUR'],
             },
             {
+                label: 'Opérateurs',
+                icon: 'pi pi-fw pi-id-card',
+                routerLink: ['/admin/operateurs'],
+            },
+            {
                 label: 'Module',
                 icon: 'pi pi-fw pi-th-large',
                 routerLink: ['/admin/module-param'],

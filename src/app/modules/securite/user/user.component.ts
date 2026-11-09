@@ -41,6 +41,8 @@ import * as menuSelector from '../../../store/menu/selector';
 import { LoadingSpinnerComponent } from '../../loading-spinner.component';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { Operateur } from 'src/app/store/operateur/model';
+import { OperateurService } from 'src/app/store/operateur/service';
 import { em } from '@fullcalendar/core/internal-common';
 
 @Component({
@@ -104,6 +106,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
     rowsPerPageOptions = [5, 10, 20];
     profils: Profil[] = [];
+    operateurs: Operateur[] = [];
     ancien!: string;
     visible: boolean = false;
     newPassword!: string ;
@@ -155,7 +158,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
     constructor(private messageService: MessageService, private confirmationService: ConfirmationService,private store: Store<AppState>,
          private userService: UserService,private accountService: AccountService,
-          private profilService: ProfilService) { }
+          private profilService: ProfilService, private operateurService: OperateurService) { }
 
     ngOnInit() {
         this.loadItems();
@@ -205,13 +208,23 @@ export class UserComponent implements OnInit, OnDestroy {
 
                           if (value) {
                             this.loading = false;
-                            this.users = value;
+                            this.users = this.bindOperateurToUsers(value);
                           }
               });
 
+      this.operateurService.getAll().subscribe({
+        next: (operateurs) => {
+          this.operateurs = operateurs || [];
+          this.users = this.bindOperateurToUsers(this.users);
+        },
+        error: () => {
+          this.operateurs = [];
+        }
+      });
+
     }
 
-    
+
 
     findDroitMenu() {
         if(this.op2) {
@@ -236,8 +249,18 @@ export class UserComponent implements OnInit, OnDestroy {
         this.profil = {};
 
     }
+    private bindOperateurToUsers(users: User[]): User[] {
+        return users.map((user) => {
+            const operateur = this.operateurs.find((item) => item.id === user.operateurId);
+            return {
+                ...user,
+                operateur: operateur ?? user.operateur
+            };
+        });
+    }
+
     addUser() {
-        this.user = {};
+        this.user = { operateurId: undefined };
         this.display = true;
     }
 
@@ -590,20 +613,21 @@ export class UserComponent implements OnInit, OnDestroy {
     }
     saveUser() {
         this.submitted = true;
-        console.log("====================",this.user)
-       // if (this.user.nom && this.user.code && this.user.codeBanque && this.user.pays) {
-            if (this.user.id) {
-                this.store.dispatch(userAction.updateUser(this.user));
-            } else {
-                this.store.dispatch(userAction.createUser(this.user));
+        const payload: User = {
+            ...this.user,
+            operateurId: this.user.operateurId ?? undefined,
+            profil: this.user.profil
+        };
+        console.log("====================", payload);
+        if (this.user.id) {
+            this.store.dispatch(userAction.updateUser(payload));
+        } else {
+            this.store.dispatch(userAction.createUser(payload));
+        }
 
-            }
-
-
-            this.userDialog = false;
-            this.user = {};
-            this.selectedMulti ={};
-       // }
+        this.userDialog = false;
+        this.user = { operateurId: undefined };
+        this.selectedMulti = {};
     }
 
 
