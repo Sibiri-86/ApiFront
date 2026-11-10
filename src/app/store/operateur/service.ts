@@ -1,12 +1,14 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { GlobalConfig } from 'src/app/config/global.config';
 import { Endpoints } from 'src/app/config/module.endpoints';
 import { Operateur } from './model';
+import { AuthServerProvider } from 'src/app/service-util/auth/auth-jwt.service';
 
 @Injectable({ providedIn: 'root' })
 export class OperateurService {
+     private auth = inject(AuthServerProvider);
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Operateur[]> {
@@ -29,6 +31,13 @@ export class OperateurService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${GlobalConfig.getEndpoint(Endpoints.OPERATEUR)}/${id}`).pipe(
+      catchError(this.handleError())
+    );
+  }
+
+    getOperateurConnecte(): Observable<Operateur> {
+
+    return this.http.get<Operateur>(`${GlobalConfig.getEndpoint(Endpoints.OPERATEUR)}/connecte/${this.auth.getAccessToken()}`).pipe(
       catchError(this.handleError())
     );
   }

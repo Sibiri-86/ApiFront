@@ -1,0 +1,20 @@
+export const ROLES = {
+    // Groupes
+    GRP_ADMINISTRATION: 'Administration',
+    GRP_TVM: 'TVM',
+    GRP_TR: 'TR',
+    GRP_IMPOT: 'IMPOT',
+    // Administration
+    UTILISATEUR: 'UTILISATEUR',
+    OPERATEUR: 'OPERATEUR',
+    APPLICATION: 'APPLICATION',
+    PROFIL: 'PROFIL',
+    // Gestion des TVM
+    VERIFICATION: 'VERIFICATION',
+    CONSULTATION_TVM: 'CONSULTATION_TVM',
+    // Gestion des TR
+    VERIFICATION_TR: 'VERIFICATION_TR',
+    CONSULTATION_TR: 'CONSULTATION_TR',
+    // Gestion des impôts
+    CONSULTATION_IMPOT: 'CONSULTATION_IMPOT',
+};

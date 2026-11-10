@@ -2,31 +2,32 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AccountService } from './account.service';
 import { AuthServerProvider } from './auth-jwt.service';
-import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, switchMap, tap, throwError } from 'rxjs';
 import { User } from 'src/app/store/user/model';
 import { MessageService } from 'primeng/api';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
     constructor(
-        private accountService: AccountService, 
+        private accountService: AccountService,
         private authServerProvider: AuthServerProvider,
         private router: Router,
         private messageService: MessageService
     ) {}
 
     login(credentials: any): Observable<any> {
-        return this.authServerProvider.login(credentials).pipe(
-            tap((response: any) => {
-                console.log('✅ Données de connexion reçues:', response);
-            }),
-          catchError((error) => {
-                console.error('❌ Erreur lors de la connexion:', error);
-                this.logout();
-                return throwError(() => error);
-            })
-        );
-    }
+    return this.authServerProvider.login(credentials).pipe(
+        // Le jeton est stocké à ce stade : on charge l'utilisateur et ses droits
+        switchMap((response) =>
+            this.accountService.forceRefreshUserData().pipe(map(() => response))
+        ),
+        catchError((error) => {
+            console.error('❌ Erreur lors de la connexion:', error);
+            this.logout();
+            return throwError(() => error);
+        })
+    );
+}
 
     /**
      * Déconnecte l'utilisateur
@@ -36,27 +37,27 @@ export class LoginService {
     logout(showMessage: boolean = false, customMessage?: string): void {
         try {
             console.log('🚪 Déconnexion de l\'utilisateur');
-            
+
             // Déconnexion via AuthServerProvider (gère tout le nettoyage)
             this.authServerProvider.logout();
-            
+
             // Réinitialiser l'état d'authentification dans AccountService
             this.accountService.authenticate(null);
-            
+
             // Supprimer les données utilisateur du localStorage
             localStorage.removeItem('UTILISATEUR_KEY');
-            
+
             // Afficher un message si demandé
             if (showMessage) {
                 const message = customMessage || 'Vous avez été déconnecté';
                 this.showLogoutMessage(message);
             }
-            
+
             // Rediriger vers la page de connexion
             this.router.navigate(['/admin/login'], {
                 queryParams: { reason: showMessage ? 'session-expired' : 'logout' }
             });
-            
+
             console.log('✅ Déconnexion effectuée avec succès');
         } catch (error) {
             console.error('❌ Erreur lors de la déconnexion:', error);
@@ -108,7 +109,7 @@ export class LoginService {
         return this.authServerProvider.getUserInfo();
     }
 
-    
+
 
     /**
      * Récupère le token d'accès stocké
@@ -117,7 +118,7 @@ export class LoginService {
         return this.authServerProvider.getAccessToken();
     }
 
-    
+
 
     /**
      * Génère les en-têtes d'authentification
@@ -132,7 +133,7 @@ export class LoginService {
      * ====================================================================
      * Envoie une demande de réinitialisation de mot de passe.
      * Un email sera envoyé à l'utilisateur avec un lien de réinitialisation.
-     * 
+     *
      * @param matricule - Le matricule de l'utilisateur
      * @returns Observable contenant la réponse du serveur
      */
@@ -165,7 +166,7 @@ export class LoginService {
      * NOUVELLE MÉTHODE - Confirmation de réinitialisation du mot de passe
      * ====================================================================
      * Confirme la réinitialisation du mot de passe avec le token reçu par email.
-     * 
+     *
      * @param key - Le token de réinitialisation reçu par email
      * @param newPassword - Le nouveau mot de passe
      * @returns Observable contenant la réponse du serveur

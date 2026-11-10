@@ -35,7 +35,7 @@ export class AccountService {
             })
         );
     }
-    
+
     updatePassword(newPassword: string, currentPassword: string): Observable<any> {
         console.log('Updating password...');
         return this.http.post('/users/account/change-password', { currentPassword, newPassword });
@@ -49,19 +49,6 @@ export class AccountService {
         return this.http.post('/account', account, { observe: 'response' });
     }
 
-    authenticate(identity: Account | null): void {
-        this.userIdentity = identity;
-        this.authenticated = identity !== null;
-        this.authorities = identity?.authorities || [];
-        this.authenticationState.next(this.userIdentity);
-        
-        // Sauvegarder dans le localStorage
-        if (identity) {
-            this.saveAuthenticationState(identity);
-        } else {
-            this.clearAuthenticationState();
-        }
-    }
 
     // Sauvegarder l'état dans le localStorage
     private saveAuthenticationState(account: Account): void {
@@ -131,7 +118,7 @@ export class AccountService {
             return false;
         }
 
-        return authorities.some(authority => 
+        return authorities.some(authority =>
             this.userIdentity!.authorities.includes(authority)
         );
     }
@@ -175,10 +162,10 @@ export class AccountService {
                 this.userIdentity = JSON.parse(storedUser);
                 this.authenticated = true;
                 this.authorities = this.userIdentity?.authorities || [];
-                
+
                 // Rafraîchir les données en arrière-plan
                 this.refreshUserData();
-                
+
                 return of(this.userIdentity);
             } catch (error) {
                 console.error('Error parsing stored user:', error);
@@ -238,4 +225,28 @@ export class AccountService {
         this.resetAuthenticationState();
         this.router.navigate(['/admin/login']);
     }
+
+    authenticate(identity: Account | null): void {
+    if (identity) {
+        identity = { ...identity, authorities: this.normalizeAuthorities(identity) };
+    }
+    this.userIdentity = identity;
+    this.authenticated = identity !== null;
+    this.authorities = identity?.authorities || [];
+    this.authenticationState.next(this.userIdentity);
+
+    if (identity) {
+        this.saveAuthenticationState(identity);
+    } else {
+        this.clearAuthenticationState();
+    }
+}
+
+/** Accepte authorities / roles / droits, sous forme de chaînes ou d'objets */
+private normalizeAuthorities(identity: any): string[] {
+    const raw: any[] = identity?.authorities ?? identity?.roles ?? identity?.droits ?? [];
+    return raw
+        .map((r) => (typeof r === 'string' ? r : r?.code ?? r?.nom ?? r?.name ?? r?.authority))
+        .filter((r): r is string => !!r);
+}
 }

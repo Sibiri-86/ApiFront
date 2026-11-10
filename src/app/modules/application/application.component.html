@@ -1,0 +1,81 @@
+<p-toast></p-toast>
+
+<div class="profil-page" *ngIf="operateur; else vide">
+
+  <!-- En-tête opérateur -->
+  <header class="profil-header">
+    <span class="profil-icon"><i class="pi pi-building"></i></span>
+    <div class="flex flex-column">
+      <h2 class="m-0">{{ operateur.libelleOperateur }}</h2>
+      <small class="text-color-secondary">Code : <strong>{{ operateur.codeOperateur }}</strong></small>
+    </div>
+  </header>
+
+  <!-- Informations -->
+  <section class="profil-section">
+    <h4 class="section-title"><i class="pi pi-id-card"></i> Informations de l'opérateur</h4>
+    <div class="grid">
+      <div class="col-12 md:col-5">
+        <span class="info-label">Code</span>
+        <div class="info-value">{{ operateur.codeOperateur }}</div>
+      </div>
+      <div class="col-12 md:col-7">
+        <span class="info-label">Libellé</span>
+        <div class="info-value">{{ operateur.libelleOperateur }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APIs + clés secrètes -->
+  <section class="profil-section">
+    <h4 class="section-title"><i class="pi pi-key"></i> Mes accès API</h4>
+
+    <div *ngIf="!activeApis.length" class="text-color-secondary">
+      Aucune API n'est activée pour cet opérateur.
+    </div>
+
+    <div class="grid" *ngIf="activeApis.length">
+      <div class="col-12 md:col-6" *ngFor="let api of activeApis">
+        <div class="api-card" [class.editing]="editing[api.secretKey]">
+          <div class="api-card-head">
+            <div>
+              <span class="api-label">{{ api.label }}</span>
+              <small class="block text-color-secondary">{{ api.description }}</small>
+            </div>
+            <span class="api-badge"><i class="pi pi-check-circle"></i> Actif</span>
+          </div>
+
+          <label class="secret-label" [for]="api.secretKey">Clé secrète</label>
+
+          <!-- Lecture -->
+          <div class="secret-row" *ngIf="!editing[api.secretKey]">
+            <span class="secret-mask">{{ operateur[api.secretKey] ? '••••••••••••' : 'Non renseignée' }}</span>
+            <button pButton pRipple type="button" icon="pi pi-pencil" label="Modifier"
+                    class="p-button-text p-button-sm" (click)="startEdit(api)"></button>
+          </div>
+
+          <!-- Édition -->
+          <div class="secret-row" *ngIf="editing[api.secretKey]">
+            <p-password [inputId]="api.secretKey" [(ngModel)]="secrets[api.secretKey]"
+                        [feedback]="false" [toggleMask]="true" placeholder="Nouvelle clé secrète"
+                        styleClass="w-full" inputStyleClass="w-full"></p-password>
+            <button pButton pRipple type="button" icon="pi pi-times"
+                    class="p-button-text p-button-secondary p-button-rounded"
+                    (click)="cancelEdit(api)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="profil-actions" *ngIf="activeApis.length">
+    <button pButton pRipple type="button" label="Enregistrer les modifications" icon="pi pi-check"
+            class="p-button-success" [disabled]="!hasChanges" (click)="saveSecrets()"></button>
+  </div>
+</div>
+
+<ng-template #vide>
+  <div class="profil-page text-center text-color-secondary">
+    <i class="pi pi-spin pi-spinner"></i> Chargement des informations…
+  </div>
+</ng-template>

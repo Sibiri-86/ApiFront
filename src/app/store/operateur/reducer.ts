@@ -7,7 +7,11 @@ const featureReducer = createReducer<OperateurState>(
   on(featureActions.setOperateur, (state, { operateurs }): OperateurState => ({
     ...state,
     operateurs
-  }))
+  })),
+    on(featureActions.setOperateurConnecte, (state, { operateur }): OperateurState => ({
+      ...state,
+      operateur
+    }))
 );
 
 export function OperateurReducer(state: OperateurState | undefined, action: Action): OperateurState {

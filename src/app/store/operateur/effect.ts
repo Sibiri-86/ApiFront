@@ -73,4 +73,19 @@ export class OperateurEffects {
       )
     )
   );
+
+    loadOperateurConnecte$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(featureActions.loadOperateurConnecte),
+      mergeMap(() =>
+        this.operateurService.getOperateurConnecte().pipe(
+          switchMap((operateur) => [
+            featureActions.setOperateurConnecte({ operateur })
+          ]),
+          catchError((error) => of(GlobalConfig.setStatus(StatusEnum.error, error?.message || error)))
+        )
+      )
+    )
+  );
+
 }

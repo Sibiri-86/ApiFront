@@ -1,8 +1,9 @@
-import { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
-import { AppMenuitemComponent } from './app.menuitem.component';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { AppMenuitemComponent } from './app.menuitem.component';
 import { AccountService } from '../service-util/auth/account.service';
+import { ROLES } from '../service-util/auth/roles';
 
 interface MenuItem {
     label?: string;
@@ -19,134 +20,150 @@ interface MenuItem {
     standalone: true,
     imports: [NgFor, NgIf, AppMenuitemComponent]
 })
-export class AppMenuComponent implements OnInit {
+export class AppMenuComponent implements OnInit, OnDestroy {
 
     model: MenuItem[] = [];
+
+    private authSubscription?: Subscription;
 
     constructor(private accountService: AccountService) {}
 
     ngOnInit(): void {
-        // S'abonner aux changements d'authentification
-        this.accountService.getAuthenticationState().subscribe(() => {
-            this.buildMenu();
-        });
+        // Reconstruire le menu à chaque changement d'authentification
+        this.authSubscription = this.accountService
+            .getAuthenticationState()
+            .subscribe(() => this.buildMenu());
 
-        // Construire le menu initial
+        // Construction initiale
         this.buildMenu();
+    }
+
+    ngOnDestroy(): void {
+        this.authSubscription?.unsubscribe();
     }
 
     private buildMenu(): void {
         const fullMenu: MenuItem[] = [
-    {
-        items: [
             {
-                label: 'Dashboard',
-                icon: 'pi pi-fw pi-home',
-                routerLink: ['/admin/dashboard']
-            }
-        ]
-    },
+                items: [
+                    {
+                        label: 'Dashboard',
+                        icon: 'pi pi-fw pi-home',
+                        routerLink: ['/admin/dashboard']
+                    }
+                ]
+            },
 
-    {
-        label: 'Administration',
-        icon: 'pi pi-fw pi-shield',
-        // roles: ['PARAMTRAGE'],
-        items: [
             {
-                label: 'Utilisateurs',
-                icon: 'pi pi-fw pi-users',
-                routerLink: ['/admin/user'],
-                // roles: ['UTILISATEUR'],
+                label: 'Administration',
+                icon: 'pi pi-fw pi-shield',
+                roles: [ROLES.GRP_ADMINISTRATION],
+                items: [
+                    {
+                        label: 'Utilisateurs',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/admin/user'],
+                        roles: [ROLES.UTILISATEUR],
+                    },
+                    {
+                        label: 'Opérateurs',
+                        icon: 'pi pi-fw pi-id-card',
+                        routerLink: ['/admin/operateurs'],
+                        roles: [ROLES.OPERATEUR],
+                    },
+                    {
+                        label: 'Applications',
+                        icon: 'pi pi-fw pi-cog',
+                        routerLink: ['/admin/applications'],
+                        roles: [ROLES.APPLICATION],
+                    },
+                    {
+                        label: 'Module',
+                        icon: 'pi pi-fw pi-th-large',
+                        routerLink: ['/admin/module-param'],
+                        roles: [ROLES.APPLICATION], // même rôle que dans les routes
+                    },
+                ]
             },
-            {
-                label: 'Opérateurs',
-                icon: 'pi pi-fw pi-id-card',
-                routerLink: ['/admin/operateurs'],
-            },
-            {
-                label: 'Module',
-                icon: 'pi pi-fw pi-th-large',
-                routerLink: ['/admin/module-param'],
-                // roles: ['MODULE'],
-            },
-        ]
-    },
 
-    {
-        label: 'TVM',
-        icon: 'pi pi-fw pi-car',
-        items: [
             {
-                label: 'Vérification',
-                icon: 'pi pi-fw pi-verified',
-                routerLink: ['/admin/tvm-verification']
-            },
-            {
-                label: 'Consultation',
-                icon: 'pi pi-fw pi-list',
-                routerLink: ['/admin/quittance-tvm']
-            },
-        ]
-    },
+                label: 'TVM',
+                icon: 'pi pi-fw pi-car',
 
-    {
-        label: 'Taxe de Résidence',
-        icon: 'pi pi-fw pi-building',
-        items: [
-            {
-                label: 'Vérification',
-                icon: 'pi pi-fw pi-verified',
-                routerLink: ['/admin/tr-verification']
+                items: [
+                    {
+                        label: 'Vérification',
+                        icon: 'pi pi-fw pi-verified',
+                        routerLink: ['/admin/tvm-verification'],
+                        roles: [ROLES.VERIFICATION],
+                    },
+                    {
+                        label: 'Consultation',
+                        icon: 'pi pi-fw pi-list',
+                        routerLink: ['/admin/quittance-tvm'],
+                        roles: [ROLES.CONSULTATION_TVM],
+                    },
+                ]
             },
-            {
-                label: 'Consultation',
-                icon: 'pi pi-fw pi-list',
-                routerLink: ['/admin/quittance-tr']
-            },
-        ]
-    },
 
-    {
-        label: 'Impôt',
-        icon: 'pi pi-fw pi-wallet',
-        items: [
             {
-                label: 'Consultation',
-                icon: 'pi pi-fw pi-file',
-                routerLink: ['/admin/quittance-impot']
+                label: 'Taxe de Résidence',
+                icon: 'pi pi-fw pi-building',
+                items: [
+                    {
+                        label: 'Vérification',
+                        icon: 'pi pi-fw pi-verified',
+                        routerLink: ['/admin/tr-verification'],
+                        roles: [ROLES.VERIFICATION_TR],
+                    },
+                    {
+                        label: 'Consultation',
+                        icon: 'pi pi-fw pi-list',
+                        routerLink: ['/admin/quittance-tr'],
+                        roles: [ROLES.CONSULTATION_TR],
+                    },
+                ]
             },
-        ]
-    },
-];
 
-        // Filtrer le menu en fonction des rôles de l'utilisateur
+            {
+                label: 'Impôt',
+                icon: 'pi pi-fw pi-wallet',
+                items: [
+                    {
+                        label: 'Consultation',
+                        icon: 'pi pi-fw pi-file',
+                        routerLink: ['/admin/quittance-impot'],
+                        roles: [ROLES.CONSULTATION_IMPOT],
+                    },
+                ]
+            },
+        ];
+
+        // Filtrer le menu selon les rôles de l'utilisateur
         this.model = this.filterMenuByRoles(fullMenu);
     }
 
     private filterMenuByRoles(menuItems: MenuItem[]): MenuItem[] {
         return menuItems
             .map(item => {
-                // Créer une copie de l'item
                 const filteredItem: MenuItem = { ...item };
 
-                // Si l'item a des sous-items, les filtrer récursivement
+                // Filtrer les sous-items
                 if (filteredItem.items && Array.isArray(filteredItem.items)) {
                     filteredItem.items = filteredItem.items.filter((subItem: MenuItem) => {
-                        // Si le sous-item a des rôles requis, vérifier l'accès
                         if (subItem.roles && Array.isArray(subItem.roles)) {
                             return this.accountService.hasAnyAuthority(subItem.roles);
                         }
-                        // Si pas de rôles requis, afficher l'item
                         return true;
                     });
 
-                    // Si après filtrage il ne reste aucun sous-item, ne pas afficher le groupe
+                    // Aucun sous-item visible : on masque le groupe
                     if (filteredItem.items.length === 0) {
                         return null;
                     }
                 }
 
-                // Vérifier les rôles du groupe parent
+                // Rôles du groupe parent
                 if (filteredItem.roles && Array.isArray(filteredItem.roles)) {
                     if (!this.accountService.hasAnyAuthority(filteredItem.roles)) {
                         return null;
@@ -155,6 +172,6 @@ export class AppMenuComponent implements OnInit {
 
                 return filteredItem;
             })
-            .filter((item): item is MenuItem => item !== null); // Retirer les items null
+            .filter((item): item is MenuItem => item !== null);
     }
 }

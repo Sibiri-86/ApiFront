@@ -6,3 +6,5 @@ export const setOperateur = createAction('[Operateur] Set operateurs', props<{ o
 export const createOperateur = createAction('[Operateur] Create operateur', props<Operateur>());
 export const updateOperateur = createAction('[Operateur] Update operateur', props<Operateur>());
 export const deleteOperateur = createAction('[Operateur] Delete operateur', props<{ id: number }>());
+export const loadOperateurConnecte = createAction('[Operateur] Load operateur connecte');
+export const setOperateurConnecte = createAction('[Operateur] Set operateur connecte', props<{ operateur: Operateur }>());

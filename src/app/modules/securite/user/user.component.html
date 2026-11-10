@@ -29,10 +29,10 @@
                     <th style="font-weight: bold;">Profil
                         <p-columnFilter type="text" display="menu" field="profil.libelle"></p-columnFilter>
 
-                    <!-- </th>
-                    <th style="font-weight: bold;">Matricule
+                    </th>
+                    <th style="font-weight: bold;">Login
                         <p-columnFilter type="text" display="menu" field="login"></p-columnFilter>
-                    </th> -->
+                    </th>
 
                     <th style="font-weight: bold;">Nom
                         <p-columnFilter type="text" display="menu" field="lastName"></p-columnFilter>
@@ -57,7 +57,7 @@
 
 
                     <td class="table-separator ">{{user.profil?.libelle}}</td>
-                    <!-- <td class="table-separator">{{user.login }}</td> -->
+                    <td class="table-separator">{{user.login }}</td>
                     <td class="table-separator"> {{user.lastName}}</td>
                     <td class="table-separator"> {{user.firstName}}</td>
                     <td class="table-separator"> {{user.operateur?.libelleOperateur}}</td>
@@ -106,14 +106,14 @@
                 </div>
 
 
-                <div class="col-6">
+              <!--   <div class="col-6">
                     <label class="w-full">Opérateur</label>
                     <p-dropdown [options]="operateurs" name="operateur" [(ngModel)]="user.operateurId"
                         [showClear]="true" [filter]="true" [style]="{width:'100%'}" filterBy="libelleOperateur"
                         placeholder="Selectionnez un opérateur" optionLabel="libelleOperateur" optionValue="id"
                         appendTo="body" class="multiselect-custom" display="chip">
                     </p-dropdown>
-                </div>
+                </div> -->
 
                 <div class="col-6">
                     <label class="w-full">Nom <span style="color: red !important; size: 1.4em;"
