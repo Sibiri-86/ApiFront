@@ -7,6 +7,7 @@ import { CalendarModule } from 'primeng/calendar'; // PrimeNG 18+ : DatePickerMo
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
+import * as XLSX from 'xlsx';
 
 import { QuittanceActions } from '../../store/quittance-impot/action';
 import { quittanceFeature } from '../../store/quittance-impot/reducer';
@@ -61,6 +62,53 @@ export class QuittanceImpotComponent implements OnDestroy, OnInit {
 
   filtrer(table: Table, event: Event): void {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  exportExcel(): void {
+    const list = this.quittances();
+
+    if (!list.length) {
+      return;
+    }
+
+    const fileName = this.buildExportFileName();
+    const rows = list.map((q, index) => ({
+      '#': index + 1,
+      'N° quittance': q.numQuittance ?? '',
+      'Date quittance': q.dateQuittance ? formatDate(new Date(q.dateQuittance), 'dd/MM/yyyy', 'en-US') : '',
+      'Nom': q.nom ?? '',
+      'IFU': q.ifu ?? '',
+      'En commercial': q.enCommercial ?? '',
+      'Opérateur': q.operateur ?? '',
+      'Nature impôt': q.natImpot ?? '',
+      'Impôt': q.impot ?? '',
+      'Structure': q.structure ?? '',
+      'Montant': q.montantImpot ?? 0,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    worksheet['!cols'] = [
+      { wch: 5 },
+      { wch: 18 },
+      { wch: 16 },
+      { wch: 25 },
+      { wch: 20 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 15 },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Quittances Impôt');
+    XLSX.writeFile(workbook, fileName);
+  }
+
+  private buildExportFileName(): string {
+    const month = this.dateDebut ? formatDate(this.dateDebut, 'yyyy_MM', 'en-US') : formatDate(new Date(), 'yyyy_MM', 'en-US');
+    return `quittances_impot_${month}.xlsx`;
   }
 
   ngOnDestroy(): void {

@@ -112,6 +112,8 @@ export class ApplicationComponent implements OnInit, OnDestroy {
       }
     }
 
+    console.log('Dispatching updateOperateur with payload:==============', payload);
+
     this.store.dispatch(operateurAction.updateOperateur(payload));
     this.editing = {};
     this.messageService.add({
